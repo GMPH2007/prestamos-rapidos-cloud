@@ -664,7 +664,7 @@ if (btnThemeToggle) {
     });
 }
 
-// Inicialización
+// Inicialización y carga de anuncios Google AdMob / AdSense
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('prestafast_theme');
     if (savedTheme === 'light' && appBody) {
@@ -676,6 +676,17 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarTransaccionesGuardadas();
     actualizarCotizacion();
     renderCloudTable();
+
+    // Inicializar anuncios automáticos de Google AdMob / AdSense
+    try {
+        const adSlots = document.querySelectorAll('.adsbygoogle');
+        adSlots.forEach(() => {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+        });
+    } catch (e) {
+        // En espera de conexión con los servidores de Google AdMob
+    }
 });
+
 
 
