@@ -1,14 +1,14 @@
 /**
  * ============================================================================
  * PRESTAFAST MÓVIL - SISTEMA TRANSACCIONAL FINTECH EN LA NUBE
- * Amortización Francesa, Modo Claro/Oscuro y Sincronización AWS RDS
+ * Persistencia en LocalStorage, Amortización Francesa y AWS RDS
  * ============================================================================
  */
 
 // 1. Constantes Financieras
 const TASA_MENSUAL = 0.02; // 2.0% TEM (Tasa Efectiva Mensual)
 
-// 2. Estado de la Operación Actual
+// 2. Estado de la Operación en curso
 let operacion = {
     monto: 5000,
     plazo: 12,
@@ -29,13 +29,33 @@ let operacion = {
     hashCloud: ''
 };
 
-// 3. Cartera de Préstamos en Base de Datos Cloud (AWS RDS)
-let cloudDbTransactions = [
-    { op: 'OP-829101', titular: 'Carlos Mendoza', dni: '72819201', monto: 5000, plazo: 12, cuota: 472.80, banco: 'BCP', estado: 'DESEMBOLSADO' },
-    { op: 'OP-829102', titular: 'Lucia Fernandez', dni: '45910283', monto: 10000, plazo: 24, cuota: 518.74, banco: 'BBVA', estado: 'DESEMBOLSADO' },
-    { op: 'OP-829103', titular: 'Jorge Salazar', dni: '70192834', monto: 2000, plazo: 6, cuota: 363.02, banco: 'Yape / Plin', estado: 'DESEMBOLSADO' },
-    { op: 'OP-829104', titular: 'Elena Guerrero', dni: '41827394', monto: 15000, plazo: 36, cuota: 602.40, banco: 'Interbank', estado: 'DESEMBOLSADO' }
+// 3. Base de Datos Cloud Inicial (Prestamistas y Préstamos Otorgados)
+const INITIAL_TRANSACTIONS = [
+    { op: 'OP-829101', titular: 'Carlos Mendoza', dni: '72819201', monto: 5000, plazo: 12, cuota: 472.80, banco: 'BCP', estado: 'DESEMBOLSADO', fecha: '18/08/2026 10:15', esNuevo: false },
+    { op: 'OP-829102', titular: 'Lucia Fernandez', dni: '45910283', monto: 10000, plazo: 24, cuota: 518.74, banco: 'BBVA', estado: 'DESEMBOLSADO', fecha: '18/08/2026 09:40', esNuevo: false },
+    { op: 'OP-829103', titular: 'Jorge Salazar', dni: '70192834', monto: 2000, plazo: 6, cuota: 363.02, banco: 'Yape / Plin', estado: 'DESEMBOLSADO', fecha: '18/08/2026 09:10', esNuevo: false },
+    { op: 'OP-829104', titular: 'Elena Guerrero', dni: '41827394', monto: 15000, plazo: 36, cuota: 602.40, banco: 'Interbank', estado: 'DESEMBOLSADO', fecha: '18/08/2026 08:30', esNuevo: false }
 ];
+
+// Cargar transacciones desde localStorage para que NUNCA se borren al recargar
+let cloudDbTransactions = [];
+function cargarTransaccionesGuardadas() {
+    const saved = localStorage.getItem('prestafast_db_transactions');
+    if (saved) {
+        try {
+            cloudDbTransactions = JSON.parse(saved);
+        } catch (e) {
+            cloudDbTransactions = [...INITIAL_TRANSACTIONS];
+        }
+    } else {
+        cloudDbTransactions = [...INITIAL_TRANSACTIONS];
+        guardarTransacciones();
+    }
+}
+
+function guardarTransacciones() {
+    localStorage.setItem('prestafast_db_transactions', JSON.stringify(cloudDbTransactions));
+}
 
 // 4. Elementos del DOM
 const rangeMonto = document.getElementById('rangeMonto');
@@ -441,7 +461,7 @@ bankPills.forEach(pill => {
     });
 });
 
-// Desembolso Final
+// Desembolso Final y Registro Persistente en Base de Datos Cloud
 if (btnDesembolsar) {
     btnDesembolsar.addEventListener('click', () => {
         const inpNumCuenta = document.getElementById('inpNumCuenta');
@@ -489,7 +509,10 @@ if (btnDesembolsar) {
             if (vPlanVal) vPlanVal.textContent = `${operacion.plazo} cuotas fijas de ${formatearMoneda(operacion.cuota)}`;
             if (vHashVal) vHashVal.textContent = hash;
 
-            // Agregar a la BD Cloud
+            // Quitar marca de 'esNuevo' a los anteriores
+            cloudDbTransactions.forEach(t => t.esNuevo = false);
+
+            // AGREGAR EL NUEVO PRÉSTAMO EN LA CIMA CON PERSISTENCIA
             cloudDbTransactions.unshift({
                 op: opId,
                 titular: `${operacion.nombres} ${operacion.apellidos}`,
@@ -498,12 +521,18 @@ if (btnDesembolsar) {
                 plazo: operacion.plazo,
                 cuota: operacion.cuota,
                 banco: operacion.banco,
-                estado: 'DESEMBOLSADO'
+                estado: 'DESEMBOLSADO',
+                fecha: fecha,
+                esNuevo: true
             });
 
+            // Guardar en LocalStorage para que se mantenga permanentemente
+            guardarTransacciones();
+
+            // Actualizar tabla en vivo
             renderCloudTable();
             cambiarPaso(5);
-            mostrarToast('¡Desembolso Exitoso!', 'Dinero acreditado en tu cuenta.');
+            mostrarToast('¡Desembolso Exitoso!', 'Préstamo guardado y registrado en la base de datos Cloud.');
         }, 1300);
     });
 }
@@ -521,7 +550,7 @@ if (btnNuevoCredito) {
 }
 
 /**
- * Renderiza la tabla de monitoreo Cloud con soporte de búsqueda y filtrado
+ * Renderiza la tabla de monitoreo Cloud con soporte de búsqueda, filtrado y resaltado de últimos préstamos
  */
 function renderCloudTable() {
     const tbody = document.getElementById('cloudLiveTbody');
@@ -542,12 +571,15 @@ function renderCloudTable() {
     if (filtrados.length === 0) {
         html = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:15px;">No se encontraron préstamos coincidentes.</td></tr>`;
     } else {
-        filtrados.forEach((t, idx) => {
+        filtrados.forEach((t) => {
+            const rowClass = t.esNuevo ? 'highlight-new-row' : '';
+            const newBadge = t.esNuevo ? '<span class="new-tag-blink">✨ NUEVO</span> ' : '';
+            
             html += `
-                <tr>
+                <tr class="${rowClass}">
                     <td><code>${t.op}</code></td>
-                    <td>${t.titular} (${t.dni})</td>
-                    <td><strong>${formatearMoneda(t.monto)}</strong></td>
+                    <td>${newBadge}<strong>${t.titular}</strong> (${t.dni})</td>
+                    <td><strong class="color-accent">${formatearMoneda(t.monto)}</strong></td>
                     <td>${t.plazo} m</td>
                     <td>${formatearMoneda(t.cuota)}</td>
                     <td><span class="badge-tag-ok">${t.estado}</span></td>
@@ -558,10 +590,15 @@ function renderCloudTable() {
     }
     tbody.innerHTML = html;
 
+    // Calcular estadísticas dinámicas reales
     const cntDbTrans = document.getElementById('cntDbTrans');
     const cntDbClientes = document.getElementById('cntDbClientes');
+    
+    // Contar DNIs únicos
+    const clientesUnicos = new Set(cloudDbTransactions.map(t => t.dni)).size;
+    
     if (cntDbTrans) cntDbTrans.textContent = `${cloudDbTransactions.length} Registradas`;
-    if (cntDbClientes) cntDbClientes.textContent = `${cloudDbTransactions.length + 1} Clientes`;
+    if (cntDbClientes) cntDbClientes.textContent = `${clientesUnicos} Clientes`;
 }
 
 // Búsqueda y filtrado en tiempo real
@@ -636,6 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (themeIcon) themeIcon.textContent = '🌙';
         if (themeText) themeText.textContent = 'Oscuro';
     }
+    cargarTransaccionesGuardadas();
     actualizarCotizacion();
     renderCloudTable();
 });
