@@ -21,6 +21,32 @@
         </div>
     </div>
 
+    <!-- MODAL DE DETALLE DE PRÉSTAMO / PRESTAMISTA -->
+    <div id="modalDetallePrestamo" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="mTitle">Detalle de Operación</h3>
+                    <span class="badge-tag-cloud" id="mIdOp">OP-829101</span>
+                </div>
+                <button type="button" class="btn-close-modal" id="btnCloseModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="m-row"><span>Cliente:</span> <strong id="mCliente">Carlos Mendoza</strong></div>
+                <div class="m-row"><span>DNI / Documento:</span> <span id="mDni">72819201</span></div>
+                <div class="m-row"><span>Monto Capital:</span> <strong class="color-accent" id="mMonto">S/ 5,000.00</strong></div>
+                <div class="m-row"><span>Plazo y Cuota:</span> <span id="mPlazoCuota">12 meses de S/ 472.80</span></div>
+                <div class="m-row"><span>Tasa de Interés:</span> <span>2.0% TEM (Amortización Francesa)</span></div>
+                <div class="m-row"><span>Entidad Destino:</span> <strong id="mBanco">BCP</strong></div>
+                <div class="m-row"><span>Estado Cloud:</span> <span class="badge-tag-ok" id="mEstado">DESEMBOLSADO</span></div>
+                <div class="m-row"><span>Servidor Cloud:</span> <code>AWS RDS PostgreSQL Multi-AZ</code></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action-main" id="btnModalCerrar">Entendido / Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- CONTENEDOR PRINCIPAL APP CELULAR (MAX-WIDTH OPTIMIZADO PARA MÓVILES) -->
     <div class="mobile-phone-wrapper">
 
@@ -45,6 +71,16 @@
             </div>
         </header>
 
+        <!-- PESTAÑAS RÁPIDAS DE NAVEGACIÓN (PRESTATARIO / CARTERA CLOUD) -->
+        <nav class="app-nav-tabs">
+            <button type="button" class="tab-btn active" id="tabSolicitar">
+                ⚡ Solicitar Préstamo
+            </button>
+            <button type="button" class="tab-btn" id="tabCartera">
+                🏛️ Cartera de Préstamos Cloud
+            </button>
+        </nav>
+
         <!-- BANNER DE CONFIANZA FINANCIERA -->
         <div class="security-banner">
             <div class="sec-item"><span>🔒</span> Cifrado Bancario AES-256</div>
@@ -52,7 +88,7 @@
         </div>
 
         <!-- INDICADOR DE PROGRESO DE 4 PASOS -->
-        <div class="flow-stepper">
+        <div class="flow-stepper" id="flowStepperContainer">
             <div class="step-badge active" id="stepPill1">
                 <span class="step-num">1</span>
                 <span class="step-text">Cotizar</span>
@@ -255,7 +291,7 @@
                     <input type="text" class="otp-cell" maxlength="1" id="c3">
                     <input type="text" class="otp-cell" maxlength="1" id="c4">
                 </div>
-                <div class="otp-help">Código de verificación para la prueba: <span class="code-tag">8520</span></div>
+                <div class="otp-help">Código de verificación: <span class="code-tag" title="Haz clic para autocompletar">8520</span></div>
                 <div class="timer-line">Reenviar código en <strong id="timerVal">45s</strong></div>
             </div>
 
@@ -389,6 +425,19 @@
                 <span class="live-pill">● EN VIVO</span>
             </div>
 
+            <!-- CONTROLES DE BÚSQUEDA Y FILTRADO EN TIEMPO REAL -->
+            <div class="search-filter-row">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="inpBuscarPrestamo" placeholder="Buscar por DNI, Nombre o N° Op...">
+                </div>
+                <select id="selectFiltroEstado" class="filter-select">
+                    <option value="TODOS">Todos los estados</option>
+                    <option value="DESEMBOLSADO">Desembolsados</option>
+                    <option value="PENDIENTE">En Evaluación</option>
+                </select>
+            </div>
+
             <div class="stats-mini-grid">
                 <div class="stat-mini">
                     <span class="s-label">Estado RDS</span>
@@ -418,7 +467,7 @@
                             <th>Plazo</th>
                             <th>Cuota</th>
                             <th>Estado</th>
-                            <th>Base de Datos</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody id="cloudLiveTbody">

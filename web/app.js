@@ -8,7 +8,7 @@
 // 1. Constantes Financieras
 const TASA_MENSUAL = 0.02; // 2.0% TEM (Tasa Efectiva Mensual)
 
-// 2. Estado de la Operación
+// 2. Estado de la Operación Actual
 let operacion = {
     monto: 5000,
     plazo: 12,
@@ -29,12 +29,12 @@ let operacion = {
     hashCloud: ''
 };
 
-// 3. Simulación de Base de Datos Cloud RDS
+// 3. Cartera de Préstamos en Base de Datos Cloud (AWS RDS)
 let cloudDbTransactions = [
-    { op: 'OP-829101', titular: 'Carlos Mendoza (72819201)', monto: 5000, plazo: 12, cuota: 472.80, estado: 'DESEMBOLSADO' },
-    { op: 'OP-829102', titular: 'Lucia Fernandez (45910283)', monto: 10000, plazo: 24, cuota: 518.74, estado: 'DESEMBOLSADO' },
-    { op: 'OP-829103', titular: 'Jorge Salazar (70192834)', monto: 2000, plazo: 6, cuota: 363.02, estado: 'DESEMBOLSADO' },
-    { op: 'OP-829104', titular: 'Elena Guerrero (41827394)', monto: 15000, plazo: 36, cuota: 602.40, estado: 'DESEMBOLSADO' }
+    { op: 'OP-829101', titular: 'Carlos Mendoza', dni: '72819201', monto: 5000, plazo: 12, cuota: 472.80, banco: 'BCP', estado: 'DESEMBOLSADO' },
+    { op: 'OP-829102', titular: 'Lucia Fernandez', dni: '45910283', monto: 10000, plazo: 24, cuota: 518.74, banco: 'BBVA', estado: 'DESEMBOLSADO' },
+    { op: 'OP-829103', titular: 'Jorge Salazar', dni: '70192834', monto: 2000, plazo: 6, cuota: 363.02, banco: 'Yape / Plin', estado: 'DESEMBOLSADO' },
+    { op: 'OP-829104', titular: 'Elena Guerrero', dni: '41827394', monto: 15000, plazo: 36, cuota: 602.40, banco: 'Interbank', estado: 'DESEMBOLSADO' }
 ];
 
 // 4. Elementos del DOM
@@ -61,6 +61,12 @@ const viewPaso2 = document.getElementById('viewPaso2');
 const viewPaso3 = document.getElementById('viewPaso3');
 const viewPaso4 = document.getElementById('viewPaso4');
 const viewVoucher = document.getElementById('viewVoucher');
+const seccionMonitor = document.getElementById('seccionMonitor');
+const flowStepperContainer = document.getElementById('flowStepperContainer');
+
+// Pestañas
+const tabSolicitar = document.getElementById('tabSolicitar');
+const tabCartera = document.getElementById('tabCartera');
 
 // Botones de Navegación
 const btnPaso1Siguiente = document.getElementById('btnPaso1Siguiente');
@@ -75,6 +81,13 @@ const btnThemeToggle = document.getElementById('btnThemeToggle');
 const themeIcon = document.getElementById('themeIcon');
 const themeText = document.getElementById('themeText');
 const appBody = document.getElementById('appBody');
+
+// Buscador y Modal
+const inpBuscarPrestamo = document.getElementById('inpBuscarPrestamo');
+const selectFiltroEstado = document.getElementById('selectFiltroEstado');
+const modalDetallePrestamo = document.getElementById('modalDetallePrestamo');
+const btnCloseModal = document.getElementById('btnCloseModal');
+const btnModalCerrar = document.getElementById('btnModalCerrar');
 
 /**
  * Fórmula del Sistema Francés de Amortización:
@@ -258,6 +271,31 @@ function cambiarPaso(paso) {
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Navegación entre Pestañas (Solicitar vs. Cartera)
+if (tabSolicitar && tabCartera) {
+    tabSolicitar.addEventListener('click', () => {
+        tabSolicitar.classList.add('active');
+        tabCartera.classList.remove('active');
+        if (flowStepperContainer) flowStepperContainer.style.display = 'flex';
+        cambiarPaso(1);
+    });
+
+    tabCartera.addEventListener('click', () => {
+        tabCartera.classList.add('active');
+        tabSolicitar.classList.remove('active');
+        if (viewPaso1) viewPaso1.style.display = 'none';
+        if (viewPaso2) viewPaso2.style.display = 'none';
+        if (viewPaso3) viewPaso3.style.display = 'none';
+        if (viewPaso4) viewPaso4.style.display = 'none';
+        if (viewVoucher) viewVoucher.style.display = 'none';
+        if (flowStepperContainer) flowStepperContainer.style.display = 'none';
+
+        if (seccionMonitor) {
+            seccionMonitor.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
 }
 
 // Navegación de pasos
@@ -454,10 +492,12 @@ if (btnDesembolsar) {
             // Agregar a la BD Cloud
             cloudDbTransactions.unshift({
                 op: opId,
-                titular: `${operacion.nombres} ${operacion.apellidos} (${operacion.dni})`,
+                titular: `${operacion.nombres} ${operacion.apellidos}`,
+                dni: operacion.dni,
                 monto: operacion.monto,
                 plazo: operacion.plazo,
                 cuota: operacion.cuota,
+                banco: operacion.banco,
                 estado: 'DESEMBOLSADO'
             });
 
@@ -481,31 +521,74 @@ if (btnNuevoCredito) {
 }
 
 /**
- * Renderiza la tabla de monitoreo Cloud
+ * Renderiza la tabla de monitoreo Cloud con soporte de búsqueda y filtrado
  */
 function renderCloudTable() {
     const tbody = document.getElementById('cloudLiveTbody');
     if (!tbody) return;
-    let html = '';
-    cloudDbTransactions.forEach(t => {
-        html += `
-            <tr>
-                <td><code>${t.op}</code></td>
-                <td>${t.titular}</td>
-                <td><strong>${formatearMoneda(t.monto)}</strong></td>
-                <td>${t.plazo} m</td>
-                <td>${formatearMoneda(t.cuota)}</td>
-                <td><span class="badge-tag-ok">${t.estado}</span></td>
-                <td><span class="badge-tag-cloud">AWS RDS</span></td>
-            </tr>
-        `;
+
+    const query = inpBuscarPrestamo ? inpBuscarPrestamo.value.toLowerCase().trim() : '';
+    const estadoFiltro = selectFiltroEstado ? selectFiltroEstado.value : 'TODOS';
+
+    const filtrados = cloudDbTransactions.filter(item => {
+        const matchesQuery = item.op.toLowerCase().includes(query) ||
+                             item.titular.toLowerCase().includes(query) ||
+                             item.dni.toLowerCase().includes(query);
+        const matchesEstado = (estadoFiltro === 'TODOS') || (item.estado === estadoFiltro);
+        return matchesQuery && matchesEstado;
     });
+
+    let html = '';
+    if (filtrados.length === 0) {
+        html = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:15px;">No se encontraron préstamos coincidentes.</td></tr>`;
+    } else {
+        filtrados.forEach((t, idx) => {
+            html += `
+                <tr>
+                    <td><code>${t.op}</code></td>
+                    <td>${t.titular} (${t.dni})</td>
+                    <td><strong>${formatearMoneda(t.monto)}</strong></td>
+                    <td>${t.plazo} m</td>
+                    <td>${formatearMoneda(t.cuota)}</td>
+                    <td><span class="badge-tag-ok">${t.estado}</span></td>
+                    <td><button type="button" class="btn-detail-sm" onclick="abrirModalDetalle('${t.op}')">🔍 Ver</button></td>
+                </tr>
+            `;
+        });
+    }
     tbody.innerHTML = html;
+
     const cntDbTrans = document.getElementById('cntDbTrans');
     const cntDbClientes = document.getElementById('cntDbClientes');
     if (cntDbTrans) cntDbTrans.textContent = `${cloudDbTransactions.length} Registradas`;
     if (cntDbClientes) cntDbClientes.textContent = `${cloudDbTransactions.length + 1} Clientes`;
 }
+
+// Búsqueda y filtrado en tiempo real
+if (inpBuscarPrestamo) inpBuscarPrestamo.addEventListener('input', renderCloudTable);
+if (selectFiltroEstado) selectFiltroEstado.addEventListener('change', renderCloudTable);
+
+/**
+ * Abre el modal con el detalle completo del préstamo
+ */
+window.abrirModalDetalle = function(opId) {
+    const item = cloudDbTransactions.find(t => t.op === opId);
+    if (!item) return;
+
+    document.getElementById('mIdOp').textContent = item.op;
+    document.getElementById('mCliente').textContent = item.titular;
+    document.getElementById('mDni').textContent = item.dni;
+    document.getElementById('mMonto').textContent = formatearMoneda(item.monto);
+    document.getElementById('mPlazoCuota').textContent = `${item.plazo} cuotas fijas de ${formatearMoneda(item.cuota)}`;
+    document.getElementById('mBanco').textContent = item.banco || 'BCP';
+    document.getElementById('mEstado').textContent = item.estado;
+
+    if (modalDetallePrestamo) modalDetallePrestamo.style.display = 'flex';
+};
+
+// Cerrar Modal
+if (btnCloseModal) btnCloseModal.addEventListener('click', () => { if (modalDetallePrestamo) modalDetallePrestamo.style.display = 'none'; });
+if (btnModalCerrar) btnModalCerrar.addEventListener('click', () => { if (modalDetallePrestamo) modalDetallePrestamo.style.display = 'none'; });
 
 /**
  * Toast flotante
