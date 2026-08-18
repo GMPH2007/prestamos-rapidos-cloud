@@ -81,11 +81,13 @@ const appBody = document.getElementById('appBody');
  * C = P * [ r * (1 + r)^n ] / [ (1 + r)^n - 1 ]
  */
 function calcularCuotaFrancesa(p, r, n) {
+    if (r <= 0) return p / n;
     const factor = Math.pow(1 + r, n);
     return p * ((r * factor) / (factor - 1));
 }
 
 function formatearMoneda(val) {
+    if (isNaN(val)) val = 0;
     return 'S/ ' + val.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
@@ -93,8 +95,9 @@ function formatearMoneda(val) {
  * Actualiza la cotización en vivo
  */
 function actualizarCotizacion() {
-    const monto = parseFloat(rangeMonto.value);
-    const plazo = parseInt(rangePlazo.value);
+    if (!rangeMonto || !rangePlazo) return;
+    const monto = parseFloat(rangeMonto.value) || 5000;
+    const plazo = parseInt(rangePlazo.value) || 12;
 
     const cuota = calcularCuotaFrancesa(monto, TASA_MENSUAL, plazo);
     const total = cuota * plazo;
@@ -106,13 +109,13 @@ function actualizarCotizacion() {
     operacion.interesTotal = interes;
     operacion.totalPagar = total;
 
-    txtMonto.textContent = formatearMoneda(monto);
-    txtPlazo.textContent = `${plazo} meses`;
-    txtCuota.textContent = formatearMoneda(cuota);
-    txtMesesTag.textContent = plazo;
-    bCapital.textContent = formatearMoneda(monto);
-    bInteres.textContent = formatearMoneda(interes);
-    bTotal.textContent = formatearMoneda(total);
+    if (txtMonto) txtMonto.textContent = formatearMoneda(monto);
+    if (txtPlazo) txtPlazo.textContent = `${plazo} meses`;
+    if (txtCuota) txtCuota.textContent = formatearMoneda(cuota);
+    if (txtMesesTag) txtMesesTag.textContent = plazo;
+    if (bCapital) bCapital.textContent = formatearMoneda(monto);
+    if (bInteres) bInteres.textContent = formatearMoneda(interes);
+    if (bTotal) bTotal.textContent = formatearMoneda(total);
 
     generarCronograma(monto, TASA_MENSUAL, plazo, cuota);
 }
@@ -121,6 +124,7 @@ function actualizarCotizacion() {
  * Genera la tabla de amortización cuota por cuota
  */
 function generarCronograma(principal, tasa, numCuotas, cuota) {
+    if (!cronTableBody) return;
     let saldo = principal;
     let html = '';
     for (let i = 1; i <= numCuotas; i++) {
@@ -143,33 +147,37 @@ function generarCronograma(principal, tasa, numCuotas, cuota) {
 }
 
 // Sliders y Chips
-rangeMonto.addEventListener('input', () => {
-    montoChips.forEach(chip => {
-        if (parseFloat(chip.dataset.val) === parseFloat(rangeMonto.value)) {
-            chip.classList.add('active');
-        } else {
-            chip.classList.remove('active');
-        }
+if (rangeMonto) {
+    rangeMonto.addEventListener('input', () => {
+        montoChips.forEach(chip => {
+            if (parseFloat(chip.dataset.val) === parseFloat(rangeMonto.value)) {
+                chip.classList.add('active');
+            } else {
+                chip.classList.remove('active');
+            }
+        });
+        actualizarCotizacion();
     });
-    actualizarCotizacion();
-});
+}
 
-rangePlazo.addEventListener('input', () => {
-    plazoChips.forEach(chip => {
-        if (parseInt(chip.dataset.term) === parseInt(rangePlazo.value)) {
-            chip.classList.add('active');
-        } else {
-            chip.classList.remove('active');
-        }
+if (rangePlazo) {
+    rangePlazo.addEventListener('input', () => {
+        plazoChips.forEach(chip => {
+            if (parseInt(chip.dataset.term) === parseInt(rangePlazo.value)) {
+                chip.classList.add('active');
+            } else {
+                chip.classList.remove('active');
+            }
+        });
+        actualizarCotizacion();
     });
-    actualizarCotizacion();
-});
+}
 
 montoChips.forEach(chip => {
     chip.addEventListener('click', () => {
         montoChips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
-        rangeMonto.value = chip.dataset.val;
+        if (rangeMonto) rangeMonto.value = chip.dataset.val;
         actualizarCotizacion();
     });
 });
@@ -178,29 +186,31 @@ plazoChips.forEach(chip => {
     chip.addEventListener('click', () => {
         plazoChips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
-        rangePlazo.value = chip.dataset.term;
+        if (rangePlazo) rangePlazo.value = chip.dataset.term;
         actualizarCotizacion();
     });
 });
 
 // Desplegar / Ocultar Cronograma
-btnToggleCron.addEventListener('click', () => {
-    const visible = cronDrawer.style.display === 'block';
-    cronDrawer.style.display = visible ? 'none' : 'block';
-    btnToggleCron.textContent = visible 
-        ? '📊 Ver Tabla de Cuotas Detallada' 
-        : '▲ Ocultar Tabla de Cuotas';
-});
+if (btnToggleCron && cronDrawer) {
+    btnToggleCron.addEventListener('click', () => {
+        const visible = cronDrawer.style.display === 'block';
+        cronDrawer.style.display = visible ? 'none' : 'block';
+        btnToggleCron.textContent = visible 
+            ? '📊 Ver Tabla de Cuotas Detallada' 
+            : '▲ Ocultar Tabla de Cuotas';
+    });
+}
 
 /**
  * Control del flujo de pasos
  */
 function cambiarPaso(paso) {
-    viewPaso1.style.display = 'none';
-    viewPaso2.style.display = 'none';
-    viewPaso3.style.display = 'none';
-    viewPaso4.style.display = 'none';
-    viewVoucher.style.display = 'none';
+    if (viewPaso1) viewPaso1.style.display = 'none';
+    if (viewPaso2) viewPaso2.style.display = 'none';
+    if (viewPaso3) viewPaso3.style.display = 'none';
+    if (viewPaso4) viewPaso4.style.display = 'none';
+    if (viewVoucher) viewVoucher.style.display = 'none';
 
     // Actualizar badges
     for (let i = 1; i <= 4; i++) {
@@ -208,33 +218,42 @@ function cambiarPaso(paso) {
         if (!pill) continue;
         if (i < paso) {
             pill.className = 'step-badge completed';
-            pill.querySelector('.step-num').textContent = '✓';
+            const numEl = pill.querySelector('.step-num');
+            if (numEl) numEl.textContent = '✓';
         } else if (i === paso) {
             pill.className = 'step-badge active';
-            pill.querySelector('.step-num').textContent = i;
+            const numEl = pill.querySelector('.step-num');
+            if (numEl) numEl.textContent = i;
         } else {
             pill.className = 'step-badge';
-            pill.querySelector('.step-num').textContent = i;
+            const numEl = pill.querySelector('.step-num');
+            if (numEl) numEl.textContent = i;
         }
     }
 
-    if (paso === 1) {
+    if (paso === 1 && viewPaso1) {
         viewPaso1.style.display = 'flex';
-    } else if (paso === 2) {
+    } else if (paso === 2 && viewPaso2) {
         viewPaso2.style.display = 'flex';
-    } else if (paso === 3) {
+    } else if (paso === 3 && viewPaso3) {
         viewPaso3.style.display = 'flex';
         iniciarTimer();
-        document.getElementById('c1').focus();
-    } else if (paso === 4) {
+        const c1 = document.getElementById('c1');
+        if (c1) c1.focus();
+    } else if (paso === 4 && viewPaso4) {
         viewPaso4.style.display = 'flex';
-        // Rellenar datos del contrato
-        document.getElementById('cntNombre').textContent = `${operacion.nombres} ${operacion.apellidos}`;
-        document.getElementById('cntDni').textContent = operacion.dni;
-        document.getElementById('cntMonto').textContent = formatearMoneda(operacion.monto);
-        document.getElementById('cntPlazo').textContent = `${operacion.plazo} cuotas fijas`;
-        document.getElementById('cntCuota').textContent = formatearMoneda(operacion.cuota);
-    } else if (paso === 5) {
+        const cntNombre = document.getElementById('cntNombre');
+        const cntDni = document.getElementById('cntDni');
+        const cntMonto = document.getElementById('cntMonto');
+        const cntPlazo = document.getElementById('cntPlazo');
+        const cntCuota = document.getElementById('cntCuota');
+
+        if (cntNombre) cntNombre.textContent = `${operacion.nombres} ${operacion.apellidos}`;
+        if (cntDni) cntDni.textContent = operacion.dni;
+        if (cntMonto) cntMonto.textContent = formatearMoneda(operacion.monto);
+        if (cntPlazo) cntPlazo.textContent = `${operacion.plazo} cuotas fijas`;
+        if (cntCuota) cntCuota.textContent = formatearMoneda(operacion.cuota);
+    } else if (paso === 5 && viewVoucher) {
         viewVoucher.style.display = 'flex';
     }
 
@@ -242,61 +261,99 @@ function cambiarPaso(paso) {
 }
 
 // Navegación de pasos
-btnPaso1Siguiente.addEventListener('click', () => cambiarPaso(2));
-btnVolver1.addEventListener('click', () => cambiarPaso(1));
+if (btnPaso1Siguiente) btnPaso1Siguiente.addEventListener('click', () => cambiarPaso(2));
+if (btnVolver1) btnVolver1.addEventListener('click', () => cambiarPaso(1));
 
 // Paso 2: Envío de formulario y evaluación crediticia
-formCliente.addEventListener('submit', (e) => {
-    e.preventDefault();
+if (formCliente) {
+    formCliente.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    operacion.dni = document.getElementById('inpDni').value;
-    operacion.telefono = document.getElementById('inpTelefono').value;
-    operacion.nombres = document.getElementById('inpNombres').value;
-    operacion.apellidos = document.getElementById('inpApellidos').value;
-    operacion.email = document.getElementById('inpEmail').value;
-    operacion.ingresos = parseFloat(document.getElementById('inpIngresos').value);
-    operacion.motivo = document.getElementById('inpMotivo').value;
+        const inpDni = document.getElementById('inpDni');
+        const inpTelefono = document.getElementById('inpTelefono');
+        const inpNombres = document.getElementById('inpNombres');
+        const inpApellidos = document.getElementById('inpApellidos');
+        const inpEmail = document.getElementById('inpEmail');
+        const inpIngresos = document.getElementById('inpIngresos');
+        const inpMotivo = document.getElementById('inpMotivo');
 
-    const btnEval = document.getElementById('btnEvaluar');
-    const txtBtn = document.getElementById('txtBtnEval');
-    const spin = document.getElementById('spinEval');
+        operacion.dni = inpDni ? inpDni.value.trim() : '72819201';
+        operacion.telefono = inpTelefono ? inpTelefono.value.trim() : '987654321';
+        operacion.nombres = inpNombres ? inpNombres.value.trim() : 'Carlos Alberto';
+        operacion.apellidos = inpApellidos ? inpApellidos.value.trim() : 'Mendoza Ramos';
+        operacion.email = inpEmail ? inpEmail.value.trim() : 'carlos.mendoza@email.com';
+        operacion.ingresos = inpIngresos ? parseFloat(inpIngresos.value) : 3500;
+        operacion.motivo = inpMotivo ? inpMotivo.value : 'Consolidación de Deudas';
 
-    txtBtn.style.display = 'none';
-    spin.style.display = 'block';
-    btnEval.disabled = true;
+        const btnEval = document.getElementById('btnEvaluar');
+        const txtBtn = document.getElementById('txtBtnEval');
+        const spin = document.getElementById('spinEval');
 
-    mostrarToast('Evaluando Scoring', 'Consultando buró de crédito en AWS Cloud...');
+        if (txtBtn) txtBtn.style.display = 'none';
+        if (spin) spin.style.display = 'block';
+        if (btnEval) btnEval.disabled = true;
 
-    setTimeout(() => {
-        txtBtn.style.display = 'inline';
-        spin.style.display = 'none';
-        btnEval.disabled = false;
+        mostrarToast('Evaluando Scoring', 'Consultando buró de crédito en AWS Cloud...');
 
-        document.getElementById('otpTarget').textContent = `+51 ${operacion.telefono}`;
-        cambiarPaso(3);
-    }, 1000);
-});
+        setTimeout(() => {
+            if (txtBtn) txtBtn.style.display = 'inline';
+            if (spin) spin.style.display = 'none';
+            if (btnEval) btnEval.disabled = false;
 
-// Paso 3: Manejo de inputs OTP
+            const otpTarget = document.getElementById('otpTarget');
+            if (otpTarget) otpTarget.textContent = `+51 ${operacion.telefono}`;
+            cambiarPaso(3);
+        }, 1000);
+    });
+}
+
+// Paso 3: Manejo de inputs OTP y soporte para pegar código
 const cells = [
     document.getElementById('c1'),
     document.getElementById('c2'),
     document.getElementById('c3'),
     document.getElementById('c4')
-];
+].filter(Boolean);
 
 cells.forEach((cell, idx) => {
     cell.addEventListener('input', (e) => {
-        if (e.target.value.length === 1 && idx < 3) {
+        const val = e.target.value;
+        if (val.length >= 1 && idx < cells.length - 1) {
             cells[idx + 1].focus();
         }
     });
     cell.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace' && !e.target.value && idx > 0) {
             cells[idx - 1].focus();
+        } else if (e.key === 'Enter') {
+            if (btnValidarOtp) btnValidarOtp.click();
+        }
+    });
+    cell.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim();
+        if (pasteData.length >= 4) {
+            for (let i = 0; i < 4; i++) {
+                if (cells[i]) cells[i].value = pasteData[i];
+            }
+            if (cells[3]) cells[3].focus();
         }
     });
 });
+
+// Auto-completar al hacer clic en el código de ayuda
+const codeTag = document.querySelector('.code-tag');
+if (codeTag) {
+    codeTag.style.cursor = 'pointer';
+    codeTag.title = 'Haz clic para autocompletar';
+    codeTag.addEventListener('click', () => {
+        const demoCode = '8520';
+        for (let i = 0; i < 4; i++) {
+            if (cells[i]) cells[i].value = demoCode[i];
+        }
+        mostrarToast('Código Autocompletado', 'Código 8520 cargado exitosamente.');
+    });
+}
 
 let timer;
 function iniciarTimer() {
@@ -307,31 +364,33 @@ function iniciarTimer() {
         t--;
         if (t <= 0) {
             clearInterval(timer);
-            timerVal.textContent = 'Disponible';
+            if (timerVal) timerVal.textContent = 'Disponible';
         } else {
-            timerVal.textContent = `${t}s`;
+            if (timerVal) timerVal.textContent = `${t}s`;
         }
     }, 1000);
 }
 
-btnValidarOtp.addEventListener('click', () => {
-    const btn = document.getElementById('btnValidarOtp');
-    const txt = document.getElementById('txtBtnOtp');
-    const spin = document.getElementById('spinOtp');
+if (btnValidarOtp) {
+    btnValidarOtp.addEventListener('click', () => {
+        const btn = document.getElementById('btnValidarOtp');
+        const txt = document.getElementById('txtBtnOtp');
+        const spin = document.getElementById('spinOtp');
 
-    txt.style.display = 'none';
-    spin.style.display = 'block';
-    btn.disabled = true;
+        if (txt) txt.style.display = 'none';
+        if (spin) spin.style.display = 'block';
+        if (btn) btn.disabled = true;
 
-    setTimeout(() => {
-        txt.style.display = 'inline';
-        spin.style.display = 'none';
-        btn.disabled = false;
+        setTimeout(() => {
+            if (txt) txt.style.display = 'inline';
+            if (spin) spin.style.display = 'none';
+            if (btn) btn.disabled = false;
 
-        mostrarToast('Código OTP Válido', 'Autenticación en 2 pasos completada.');
-        cambiarPaso(4);
-    }, 800);
-});
+            mostrarToast('Código OTP Válido', 'Autenticación en 2 pasos completada.');
+            cambiarPaso(4);
+        }, 800);
+    });
+}
 
 // Paso 4: Selección de Banco
 const bankPills = document.querySelectorAll('.bank-pill');
@@ -339,77 +398,94 @@ bankPills.forEach(pill => {
     pill.addEventListener('click', () => {
         bankPills.forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
-        operacion.banco = pill.querySelector('input').value;
+        const r = pill.querySelector('input');
+        if (r) operacion.banco = r.value;
     });
 });
 
 // Desembolso Final
-btnDesembolsar.addEventListener('click', () => {
-    operacion.numCuenta = document.getElementById('inpNumCuenta').value;
-    const btn = document.getElementById('btnDesembolsar');
-    const txt = document.getElementById('txtBtnDes');
-    const spin = document.getElementById('spinDes');
+if (btnDesembolsar) {
+    btnDesembolsar.addEventListener('click', () => {
+        const inpNumCuenta = document.getElementById('inpNumCuenta');
+        operacion.numCuenta = inpNumCuenta ? inpNumCuenta.value.trim() : '191-82739102-0-45';
 
-    txt.style.display = 'none';
-    spin.style.display = 'block';
-    btn.disabled = true;
+        const btn = document.getElementById('btnDesembolsar');
+        const txt = document.getElementById('txtBtnDes');
+        const spin = document.getElementById('spinDes');
 
-    mostrarToast('Transfiriendo Fondos', 'Registrando transacción en AWS RDS PostgreSQL...');
+        if (txt) txt.style.display = 'none';
+        if (spin) spin.style.display = 'block';
+        if (btn) btn.disabled = true;
 
-    setTimeout(() => {
-        txt.style.display = 'inline';
-        spin.style.display = 'none';
-        btn.disabled = false;
+        mostrarToast('Transfiriendo Fondos', 'Registrando transacción en AWS RDS PostgreSQL...');
 
-        const opId = `OP-${Math.floor(100000 + Math.random() * 900000)}`;
-        const fecha = new Date().toLocaleString('es-PE');
-        const hash = '0x' + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+        setTimeout(() => {
+            if (txt) txt.style.display = 'inline';
+            if (spin) spin.style.display = 'none';
+            if (btn) btn.disabled = false;
 
-        operacion.numOperacion = opId;
-        operacion.fechaHora = fecha;
-        operacion.hashCloud = hash;
+            const opId = `OP-${Math.floor(100000 + Math.random() * 900000)}`;
+            const fecha = new Date().toLocaleString('es-PE');
+            const hash = '0x' + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
 
-        // Renderizar Comprobante
-        document.getElementById('vOp').textContent = opId;
-        document.getElementById('vFecha').textContent = fecha;
-        document.getElementById('vNombre').textContent = `${operacion.nombres} ${operacion.apellidos}`;
-        document.getElementById('vDniVal').textContent = operacion.dni;
-        document.getElementById('vDestino').textContent = `${operacion.banco} (${operacion.numCuenta})`;
-        document.getElementById('vMontoVal').textContent = formatearMoneda(operacion.monto);
-        document.getElementById('vPlanVal').textContent = `${operacion.plazo} cuotas fijas de ${formatearMoneda(operacion.cuota)}`;
-        document.getElementById('vHashVal').textContent = hash;
+            operacion.numOperacion = opId;
+            operacion.fechaHora = fecha;
+            operacion.hashCloud = hash;
 
-        // Agregar a la BD Cloud
-        cloudDbTransactions.unshift({
-            op: opId,
-            titular: `${operacion.nombres} ${operacion.apellidos} (${operacion.dni})`,
-            monto: operacion.monto,
-            plazo: operacion.plazo,
-            cuota: operacion.cuota,
-            estado: 'DESEMBOLSADO'
-        });
+            // Renderizar Comprobante
+            const vOp = document.getElementById('vOp');
+            const vFecha = document.getElementById('vFecha');
+            const vNombre = document.getElementById('vNombre');
+            const vDniVal = document.getElementById('vDniVal');
+            const vDestino = document.getElementById('vDestino');
+            const vMontoVal = document.getElementById('vMontoVal');
+            const vPlanVal = document.getElementById('vPlanVal');
+            const vHashVal = document.getElementById('vHashVal');
 
-        renderCloudTable();
-        cambiarPaso(5);
-        mostrarToast('¡Desembolso Exitoso!', 'Dinero acreditado en tu cuenta.');
-    }, 1300);
-});
+            if (vOp) vOp.textContent = opId;
+            if (vFecha) vFecha.textContent = fecha;
+            if (vNombre) vNombre.textContent = `${operacion.nombres} ${operacion.apellidos}`;
+            if (vDniVal) vDniVal.textContent = operacion.dni;
+            if (vDestino) vDestino.textContent = `${operacion.banco} (${operacion.numCuenta})`;
+            if (vMontoVal) vMontoVal.textContent = formatearMoneda(operacion.monto);
+            if (vPlanVal) vPlanVal.textContent = `${operacion.plazo} cuotas fijas de ${formatearMoneda(operacion.cuota)}`;
+            if (vHashVal) vHashVal.textContent = hash;
+
+            // Agregar a la BD Cloud
+            cloudDbTransactions.unshift({
+                op: opId,
+                titular: `${operacion.nombres} ${operacion.apellidos} (${operacion.dni})`,
+                monto: operacion.monto,
+                plazo: operacion.plazo,
+                cuota: operacion.cuota,
+                estado: 'DESEMBOLSADO'
+            });
+
+            renderCloudTable();
+            cambiarPaso(5);
+            mostrarToast('¡Desembolso Exitoso!', 'Dinero acreditado en tu cuenta.');
+        }, 1300);
+    });
+}
 
 // Nueva Solicitud
-btnNuevoCredito.addEventListener('click', () => {
-    formCliente.reset();
-    cells.forEach(c => c.value = '');
-    rangeMonto.value = 5000;
-    rangePlazo.value = 12;
-    actualizarCotizacion();
-    cambiarPaso(1);
-});
+if (btnNuevoCredito) {
+    btnNuevoCredito.addEventListener('click', () => {
+        if (formCliente) formCliente.reset();
+        cells.forEach(c => c.value = '');
+        if (rangeMonto) rangeMonto.value = 5000;
+        if (rangePlazo) rangePlazo.value = 12;
+        actualizarCotizacion();
+        cambiarPaso(1);
+    });
+}
 
 /**
  * Renderiza la tabla de monitoreo Cloud
  */
 function renderCloudTable() {
     const tbody = document.getElementById('cloudLiveTbody');
+    if (!tbody) return;
     let html = '';
     cloudDbTransactions.forEach(t => {
         html += `
@@ -425,8 +501,10 @@ function renderCloudTable() {
         `;
     });
     tbody.innerHTML = html;
-    document.getElementById('cntDbTrans').textContent = `${cloudDbTransactions.length} Registradas`;
-    document.getElementById('cntDbClientes').textContent = `${cloudDbTransactions.length + 1} Clientes`;
+    const cntDbTrans = document.getElementById('cntDbTrans');
+    const cntDbClientes = document.getElementById('cntDbClientes');
+    if (cntDbTrans) cntDbTrans.textContent = `${cloudDbTransactions.length} Registradas`;
+    if (cntDbClientes) cntDbClientes.textContent = `${cloudDbTransactions.length + 1} Clientes`;
 }
 
 /**
@@ -434,8 +512,11 @@ function renderCloudTable() {
  */
 function mostrarToast(titulo, msg) {
     const toast = document.getElementById('toastNotification');
-    document.getElementById('toastTitle').textContent = titulo;
-    document.getElementById('toastMsg').textContent = msg;
+    if (!toast) return;
+    const toastTitle = document.getElementById('toastTitle');
+    const toastMsg = document.getElementById('toastMsg');
+    if (toastTitle) toastTitle.textContent = titulo;
+    if (toastMsg) toastMsg.textContent = msg;
     toast.style.display = 'flex';
     setTimeout(() => {
         toast.style.display = 'none';
@@ -445,29 +526,32 @@ function mostrarToast(titulo, msg) {
 /**
  * Control del Modo Claro y Oscuro
  */
-btnThemeToggle.addEventListener('click', () => {
-    const isLight = appBody.classList.toggle('theme-light');
-    if (isLight) {
-        appBody.classList.remove('theme-dark');
-        themeIcon.textContent = '🌙';
-        themeText.textContent = 'Oscuro';
-        localStorage.setItem('prestafast_theme', 'light');
-    } else {
-        appBody.classList.add('theme-dark');
-        themeIcon.textContent = '☀️';
-        themeText.textContent = 'Claro';
-        localStorage.setItem('prestafast_theme', 'dark');
-    }
-});
+if (btnThemeToggle) {
+    btnThemeToggle.addEventListener('click', () => {
+        if (!appBody) return;
+        const isLight = appBody.classList.toggle('theme-light');
+        if (isLight) {
+            appBody.classList.remove('theme-dark');
+            if (themeIcon) themeIcon.textContent = '🌙';
+            if (themeText) themeText.textContent = 'Oscuro';
+            localStorage.setItem('prestafast_theme', 'light');
+        } else {
+            appBody.classList.add('theme-dark');
+            if (themeIcon) themeIcon.textContent = '☀️';
+            if (themeText) themeText.textContent = 'Claro';
+            localStorage.setItem('prestafast_theme', 'dark');
+        }
+    });
+}
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('prestafast_theme');
-    if (savedTheme === 'light') {
+    if (savedTheme === 'light' && appBody) {
         appBody.classList.add('theme-light');
         appBody.classList.remove('theme-dark');
-        themeIcon.textContent = '🌙';
-        themeText.textContent = 'Oscuro';
+        if (themeIcon) themeIcon.textContent = '🌙';
+        if (themeText) themeText.textContent = 'Oscuro';
     }
     actualizarCotizacion();
     renderCloudTable();
