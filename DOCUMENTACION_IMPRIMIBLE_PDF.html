@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico y Manual de Funcionamiento | PrestaFast Cloud</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #1e293b;
+            line-height: 1.6;
+            background: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .cover {
+            text-align: center;
+            padding: 40px 20px;
+            page-break-after: always;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+        .cover-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        .cover h1 {
+            font-size: 24px;
+            color: #0f172a;
+            margin: 15px 0;
+            line-height: 1.3;
+        }
+        .cover h2 {
+            font-size: 15px;
+            color: #2563eb;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cover-meta {
+            margin: 40px auto 20px;
+            max-width: 500px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .cover-meta table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cover-meta td {
+            padding: 6px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .cover-meta td:first-child {
+            font-weight: bold;
+            color: #475569;
+            width: 38%;
+        }
+        .print-btn-bar {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #2563eb;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(37,99,235,0.4);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            border: none;
+            z-index: 1000;
+        }
+        .print-btn-bar:hover {
+            background: #1d4ed8;
+        }
+        @media print {
+            .print-btn-bar { display: none; }
+            body { padding: 0; background: white; }
+            .page-break { page-break-after: always; }
+        }
+        h2.sec-title {
+            color: #1e3a8a;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 6px;
+            margin-top: 30px;
+            font-size: 18px;
+        }
+        h3.sub-title {
+            color: #0f766e;
+            font-size: 15px;
+            margin-top: 16px;
+        }
+        p, li {
+            font-size: 13px;
+            color: #334155;
+            text-align: justify;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+        table.data-table th {
+            background: #1e3a8a;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+        table.data-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            color: #334155;
+        }
+        table.data-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .callout {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            margin: 15px 0;
+            font-size: 12.5px;
+        }
+        .step-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .step-box strong {
+            color: #2563eb;
+            font-size: 13px;
+        }
+        code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn-bar" onclick="window.print()">🖨️ Imprimir / Guardar en PDF</button>
+
+    <!-- PORTADA -->
+    <div class="cover">
+        <img src="logo.png" alt="Logo PrestaFast" class="cover-logo">
+        <h2>Ingeniería de Sistemas e Informática</h2>
+        <p style="font-size: 12px; color: #64748b; font-weight: 600;">Gestión de Proyectos de TI / Arquitectura de Software y Cloud</p>
+        
+        <h1>TRABAJO ENCARGADO:<br>PLATAFORMA WEB FINTECH DE PRÉSTAMOS RÁPIDOS Y MIGRACIÓN DE BASE DE DATOS A LA NUBE</h1>
+        
+        <p style="color: #64748b; font-size: 13px;">Manual Técnico de Funcionamiento, Arquitectura AWS RDS, Matriz RACI y Ciclo de Vida</p>
+
+        <div class="cover-meta">
+            <table>
+                <tr>
+                    <td>Proyecto:</td>
+                    <td><strong>PrestaFast Cloud (Sistema Transaccional Móvil)</strong></td>
+                </tr>
+                <tr>
+                    <td>Enlace Web en Vivo:</td>
+                    <td><a href="https://gmph2007.github.io/prestamos-rapidos-cloud/" target="_blank">gmph2007.github.io/prestamos-rapidos-cloud/</a></td>
+                </tr>
+                <tr>
+                    <td>Repositorio GitHub:</td>
+                    <td><a href="https://github.com/GMPH2007/prestamos-rapidos-cloud" target="_blank">github.com/GMPH2007/prestamos-rapidos-cloud</a></td>
+                </tr>
+                <tr>
+                    <td>Fecha / Año:</td>
+                    <td>2026</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1 -->
+    <h2 class="sec-title">1. Resumen Ejecutivo del Proyecto</h2>
+    <p>El proyecto aborda la modernización integral del proceso de solicitud, evaluación y desembolso de créditos mediante el desarrollo de la plataforma web Fintech <strong>PrestaFast Cloud</strong> y la migración de la base de datos relacional local (On-Premise) hacia la nube pública administrada con <strong>Amazon RDS PostgreSQL Multi-AZ</strong>. La solución permite una evaluación crediticia en menos de 60 segundos con disponibilidad del 99.95% y cifrado de grado bancario KMS AES-256.</p>
+
+    <!-- SECCIÓN 2 -->
+    <h2 class="sec-title">2. Clasificación de los Tipos de Proyectos de TI Involucrados</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 30%;">Tipo de Proyecto TI</th>
+                <th>Alcance y Justificación Técnica</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Desarrollo de Software / Web App</strong></td>
+                <td>Construcción de la solución web transaccional Mobile-First con cotizador interactivo de amortización francesa, evaluación en tiempo real y generación de contratos digitales.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Infraestructura y Migración Cloud</strong></td>
+                <td>Aprovisionamiento de Red Privada Virtual (AWS VPC), balanceadores de carga elásticos (ALB), cómputo en contenedores (AWS ECS Fargate) y migración de base de datos a AWS RDS PostgreSQL Multi-AZ.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Ciberseguridad y Cumplimiento Fintech</strong></td>
+                <td>Implementación de autenticación de doble factor (MFA / SMS OTP), cifrado de extremo a extremo (TLS 1.3 / KMS AES-256) y protección contra vulnerabilidades OWASP Top 10 con AWS WAF.</td>
+            </tr>
+            <tr>
+                <td><strong>4. Integración de Sistemas e Interoperabilidad</strong></td>
+                <td>Conexión con burós de crédito (scoring crediticio) y pasarelas de desembolso interbancario inmediato (BCP, BBVA, Interbank, Yape / Plin).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 3 -->
+    <h2 class="sec-title">3. 3 Componentes Clave de Infraestructura Cloud</h2>
+    <div class="step-box">
+        <strong>A. Base de Datos Gestionada (DBaaS): AWS RDS PostgreSQL Multi-AZ</strong>
+        <p>Almacenamiento relacional transaccional (cumplimiento ACID). Cuenta con réplica síncrona en una segunda zona de disponibilidad para Failover automático sin caída del servicio, backups diarios automatizados con restauración puntual (PITR) hasta por 35 días y cifrado nativo KMS.</p>
+    </div>
+    <div class="step-box">
+        <strong>B. Cómputo Elástico en Contenedores: AWS ECS con AWS Fargate</strong>
+        <p>Ejecución de los microservicios backend desacoplados. Ofrece auto-escalado dinámico según la carga de peticiones, inmutabilidad de código con Docker y reducción de costos operativos por modelo Serverless.</p>
+    </div>
+    <div class="step-box">
+        <strong>C. Red Privada Virtual y Seguridad Perimetral: AWS VPC + AWS WAF + ALB</strong>
+        <p>Aislamiento estricto de la base de datos en subredes privadas sin IP pública. El Application Load Balancer distribuye el tráfico con certificados SSL/TLS y el firewall WAF bloquea ataques de inyección SQL y XSS.</p>
+    </div>
+
+    <!-- SECCIÓN 4 -->
+    <h2 class="sec-title">4. Matriz de Roles y Asignación de la Primera Tarea (RACI)</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Rol</th>
+                <th>Primera Tarea Asignada (Hito de Inicio)</th>
+                <th>Entregable de la Tarea</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Project Manager</strong></td>
+                <td>Elaborar y formalizar el Project Charter y el Backlog de Sprints.</td>
+                <td>Project Charter firmado y tablero Jira.</td>
+            </tr>
+            <tr>
+                <td><strong>Arquitecto Cloud / DevOps</strong></td>
+                <td>Diseñar la topología de red y aprovisionar la Red Privada (VPC e IAM).</td>
+                <td>Scripts Terraform de infraestructura base.</td>
+            </tr>
+            <tr>
+                <td><strong>DBA / Data Engineer</strong></td>
+                <td>Ejecutar el diagnóstico de la BD local y generar el dump DDL depurado.</td>
+                <td>Reporte de auditoría y script DDL sanitizado.</td>
+            </tr>
+            <tr>
+                <td><strong>Desarrollador Full Stack</strong></td>
+                <td>Construir el cotizador interactivo con Amortización Francesa.</td>
+                <td>Prototipo funcional de la interfaz en Git.</td>
+            </tr>
+            <tr>
+                <td><strong>Especialista en Seguridad / QA</strong></td>
+                <td>Definir matriz de requisitos de seguridad y plan de casos de prueba.</td>
+                <td>Documento de Políticas y Matriz QA.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- SECCIÓN 5 -->
+    <h2 class="sec-title">5. Ciclo de Vida del Proyecto (1 Entregable Clave por Fase)</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Fase del Ciclo de Vida</th>
+                <th>Objetivo Principal</th>
+                <th>Entregable Formal Único</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Fase 1: Inicio y Requerimientos</strong></td>
+                <td>Definir alcance, reglas financieras y viabilidad.</td>
+                <td><strong>Documento SRS y Project Charter.</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Fase 2: Diseño y Arquitectura</strong></td>
+                <td>Diseñar topología Cloud, base de datos y UI.</td>
+                <td><strong>Plan Maestro de Arquitectura y Migración de BD.</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Fase 3: Construcción y Migración</strong></td>
+                <td>Desarrollar el software y migrar la BD en Staging.</td>
+                <td><strong>Plataforma Web Funcional y BD en Staging.</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Fase 4: Pruebas y Seguridad (QA)</strong></td>
+                <td>Validar cálculos financieros y ciberseguridad.</td>
+                <td><strong>Informe de Certificación QA y Auditoría OWASP.</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Fase 5: Despliegue y Cierre</strong></td>
+                <td>Corte (Cutover), pase a vivo y entrega operativa.</td>
+                <td><strong>Acta Oficial de Pase a Producción (Go-Live).</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- SECCIÓN 6 -->
+    <h2 class="sec-title">6. Manual de Funcionamiento de la Plataforma Web Paso a Paso</h2>
+    <div class="step-box">
+        <strong>Paso 1 - Cotización con Amortización Francesa:</strong>
+        <p>El cliente selecciona el monto con los chips rápidos (<code>S/ 1,000</code>, <code>S/ 3,000</code>, <code>S/ 5,000</code>, <code>S/ 10,000</code>, <code>S/ 20,000</code>) y el plazo (6 a 36 meses). El sistema calcula la cuota fija mensual mediante la fórmula <code>C = P * [r(1+r)^n] / [(1+r)^n - 1]</code>. Al pulsar "Ver Tabla de Cuotas Detallada", se despliega el cronograma completo cuota a cuota.</p>
+    </div>
+    <div class="step-box">
+        <strong>Paso 2 - Datos del Solicitante y Scoring:</strong>
+        <p>Se ingresa DNI, teléfono celular, nombres, correo e ingresos. Al presionar "Evaluar Crédito en Tiempo Real", se procesa el perfil con scoring crediticio vía API.</p>
+    </div>
+    <div class="step-box">
+        <strong>Paso 3 - Validación de Seguridad OTP (MFA):</strong>
+        <p>Se solicita el código de seguridad de 4 dígitos enviado por SMS al celular registrado, con contador de tiempo de 45 segundos y auto-enfoque en cada celda.</p>
+    </div>
+    <div class="step-box">
+        <strong>Paso 4 - Elección de Banco y Desembolso:</strong>
+        <p>El solicitante elige entre <strong>BCP, BBVA, Interbank o Yape/Plin</strong>, ingresa su cuenta y valida el pagaré digital cifrado.</p>
+    </div>
+    <div class="step-box">
+        <strong>Paso 5 - Comprobante Digital y Auditoría Cloud:</strong>
+        <p>Se emite el comprobante de operación con Hash Criptográfico Cloud listo para imprimir/descargar en PDF, y la operación se registra automáticamente en la tabla de <strong>AWS RDS PostgreSQL</strong> en la consola inferior.</p>
+    </div>
+
+    <!-- SECCIÓN 7 -->
+    <h2 class="sec-title">7. Enlaces Oficiales de Consulta</h2>
+    <div class="callout">
+        <p><strong>🌐 Enlace Web en Vivo:</strong> <a href="https://gmph2007.github.io/prestamos-rapidos-cloud/" target="_blank">https://gmph2007.github.io/prestamos-rapidos-cloud/</a></p>
+        <p><strong>💻 Repositorio de Código en GitHub:</strong> <a href="https://github.com/GMPH2007/prestamos-rapidos-cloud" target="_blank">https://github.com/GMPH2007/prestamos-rapidos-cloud</a></p>
+    </div>
+
+</body>
+</html>
