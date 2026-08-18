@@ -1,0 +1,3 @@
+# Google AdSense & AdMob Verification File
+# PrestaFast Cloud - ID de Publicador Autorizado
+google.com, pub-4837913807928301, DIRECT, f08c47fec0942fa0
