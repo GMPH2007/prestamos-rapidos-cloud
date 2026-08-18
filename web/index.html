@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PrestaFast Móvil | Créditos Rápidos 100% Digital</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-dark" id="appBody">
+
+    <!-- TOAST NOTIFICACIÓN FLOTANTE -->
+    <div id="toastNotification" class="toast-cloud" style="display: none;">
+        <div class="toast-icon">⚡</div>
+        <div class="toast-content">
+            <span class="toast-title" id="toastTitle">AWS Cloud Conectado</span>
+            <span class="toast-msg" id="toastMsg">Base de datos RDS sincronizada.</span>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL APP CELULAR (MAX-WIDTH OPTIMIZADO PARA MÓVILES) -->
+    <div class="mobile-phone-wrapper">
+
+        <!-- CABECERA SUPERIOR DE LA APP -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo">⚡</div>
+                <div>
+                    <h1 class="app-title">PrestaFast</h1>
+                    <span class="app-badge-cloud">☁️ AWS Cloud Multi-AZ</span>
+                </div>
+            </div>
+
+            <!-- CONTROLES: CAMBIO TEMA CLARO/OSCURO Y ESTADO -->
+            <div class="header-right">
+                <button type="button" class="theme-toggle-btn" id="btnThemeToggle" title="Cambiar Tema Claro / Oscuro">
+                    <span id="themeIcon">☀️</span>
+                    <span class="theme-text" id="themeText">Claro</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- BANNER DE CONFIANZA FINANCIERA -->
+        <div class="security-banner">
+            <div class="sec-item"><span>🔒</span> Cifrado Bancario AES-256</div>
+            <div class="sec-item"><span>⚡</span> Desembolso en 15 min</div>
+        </div>
+
+        <!-- INDICADOR DE PROGRESO DE 4 PASOS -->
+        <div class="flow-stepper">
+            <div class="step-badge active" id="stepPill1">
+                <span class="step-num">1</span>
+                <span class="step-text">Cotizar</span>
+            </div>
+            <div class="step-arrow" id="stepArrow1">➔</div>
+            <div class="step-badge" id="stepPill2">
+                <span class="step-num">2</span>
+                <span class="step-text">Datos</span>
+            </div>
+            <div class="step-arrow" id="stepArrow2">➔</div>
+            <div class="step-badge" id="stepPill3">
+                <span class="step-num">3</span>
+                <span class="step-text">Seguridad</span>
+            </div>
+            <div class="step-arrow" id="stepArrow3">➔</div>
+            <div class="step-badge" id="stepPill4">
+                <span class="step-num">4</span>
+                <span class="step-text">Desembolso</span>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- PASO 1: COTIZACIÓN RÁPIDA Y CÁLCULO DE CUOTAS           -->
+        <!-- ======================================================== -->
+        <section class="card-section" id="viewPaso1">
+            <div class="section-heading">
+                <h2>¿Cuánto dinero necesitas?</h2>
+                <p class="section-sub">Elige el monto y plazo para tu crédito inmediato.</p>
+            </div>
+
+            <!-- SELECTOR DE MONTO -->
+            <div class="form-block">
+                <div class="amount-display-box">
+                    <span class="currency-label">Monto Solicitado:</span>
+                    <span class="amount-hero" id="txtMonto">S/ 5,000.00</span>
+                </div>
+
+                <input type="range" id="rangeMonto" min="500" max="20000" step="100" value="5000" class="styled-slider">
+
+                <!-- CHIPS TÁCTILES RÁPIDOS PARA CELULAR -->
+                <div class="chips-container" id="montoChips">
+                    <button type="button" class="chip" data-val="1000">S/ 1,000</button>
+                    <button type="button" class="chip" data-val="3000">S/ 3,000</button>
+                    <button type="button" class="chip active" data-val="5000">S/ 5,000</button>
+                    <button type="button" class="chip" data-val="10000">S/ 10,000</button>
+                    <button type="button" class="chip" data-val="20000">S/ 20,000</button>
+                </div>
+            </div>
+
+            <!-- SELECTOR DE PLAZO -->
+            <div class="form-block">
+                <div class="amount-display-box">
+                    <span class="currency-label">Plazo de Pago:</span>
+                    <span class="amount-hero-term" id="txtPlazo">12 meses</span>
+                </div>
+
+                <input type="range" id="rangePlazo" min="3" max="36" step="1" value="12" class="styled-slider">
+
+                <!-- CHIPS DE PLAZO -->
+                <div class="chips-container" id="plazoChips">
+                    <button type="button" class="chip" data-term="6">6 meses</button>
+                    <button type="button" class="chip active" data-term="12">12 meses</button>
+                    <button type="button" class="chip" data-term="18">18 meses</button>
+                    <button type="button" class="chip" data-term="24">24 meses</button>
+                    <button type="button" class="chip" data-term="36">36 meses</button>
+                </div>
+            </div>
+
+            <!-- TARJETA FINANCIERA DESTACADA -->
+            <div class="fintech-quote-card">
+                <div class="quote-header">
+                    <span class="quote-tag">CUOTA MENSUAL FIJA</span>
+                    <span class="tasa-pill">Tasa: 2.0% TEM</span>
+                </div>
+                
+                <div class="monthly-figure" id="txtCuota">S/ 472.80</div>
+                <div class="monthly-note"><span id="txtMesesTag">12</span> cuotas fijas (Método Francés)</div>
+
+                <div class="quote-breakdown">
+                    <div class="break-row">
+                        <span>Capital a recibir:</span>
+                        <strong id="bCapital">S/ 5,000.00</strong>
+                    </div>
+                    <div class="break-row">
+                        <span>Interés total acumulado:</span>
+                        <strong class="color-accent" id="bInteres">S/ 673.60</strong>
+                    </div>
+                    <div class="break-row total-row">
+                        <span>Total neto a pagar:</span>
+                        <strong id="bTotal">S/ 5,673.60</strong>
+                    </div>
+                </div>
+
+                <!-- CRONOGRAMA DESPLEGABLE -->
+                <button type="button" class="btn-toggle-cronograma" id="btnToggleCron">
+                    📊 Ver Tabla de Cuotas Detallada
+                </button>
+
+                <div class="cron-drawer" id="cronDrawer" style="display: none;">
+                    <div class="table-wrap">
+                        <table class="mini-table">
+                            <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Cuota</th>
+                                    <th>Capital</th>
+                                    <th>Interés</th>
+                                    <th>Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cronTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn-action-main" id="btnPaso1Siguiente">
+                Solicitar este Crédito Ahora ➔
+            </button>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- PASO 2: DATOS DEL CLIENTE Y CONSULTA DE SCORING        -->
+        <!-- ======================================================== -->
+        <section class="card-section" id="viewPaso2" style="display: none;">
+            <div class="section-heading">
+                <button type="button" class="btn-back-link" id="btnVolver1">← Cambiar Monto</button>
+                <h2>Datos del Solicitante</h2>
+                <p class="section-sub">Evaluación crediticia instantánea con base de datos Cloud.</p>
+            </div>
+
+            <form id="formCliente" class="mobile-form">
+                <div class="input-group">
+                    <label>DNI / Documento de Identidad:</label>
+                    <input type="text" id="inpDni" placeholder="Ej: 72819201" maxlength="8" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Teléfono Celular:</label>
+                    <input type="tel" id="inpTelefono" placeholder="Ej: 987654321" maxlength="9" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Nombres Completos:</label>
+                    <input type="text" id="inpNombres" placeholder="Ej: Carlos Alberto" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Apellidos:</label>
+                    <input type="text" id="inpApellidos" placeholder="Ej: Mendoza Ramos" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" id="inpEmail" placeholder="carlos.mendoza@email.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Ingreso Mensual Neto (S/):</label>
+                    <input type="number" id="inpIngresos" placeholder="Ej: 3500.00" min="600" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Motivo del Préstamo:</label>
+                    <select id="inpMotivo" class="styled-select" required>
+                        <option value="Consolidación de Deudas">Consolidación de Deudas</option>
+                        <option value="Capital de Trabajo / Negocio">Capital de Trabajo / Negocio</option>
+                        <option value="Gastos Médicos / Emergencia">Gastos Médicos / Emergencia</option>
+                        <option value="Educación / Estudios">Educación / Estudios</option>
+                        <option value="Mejoras del Hogar">Mejoras del Hogar</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-line">
+                    <input type="checkbox" id="chkTerms" required checked>
+                    <label for="chkTerms">Acepto la consulta de buró crediticio y política de protección de datos personales.</label>
+                </div>
+
+                <button type="submit" class="btn-action-main" id="btnEvaluar">
+                    <span id="txtBtnEval">⚡ Evaluar Crédito en Tiempo Real</span>
+                    <div class="spinner-btn" id="spinEval" style="display: none;"></div>
+                </button>
+            </form>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- PASO 3: VALIDACIÓN DE SEGURIDAD OTP EN 2 PASOS         -->
+        <!-- ======================================================== -->
+        <section class="card-section" id="viewPaso3" style="display: none;">
+            <div class="section-heading text-center">
+                <div class="badge-lock-center">🔒 SEGURIDAD EN 2 PASOS (MFA)</div>
+                <h2>Código de Validación</h2>
+                <p class="section-sub">Enviamos un SMS de seguridad a tu celular <strong id="otpTarget">+51 987 654 321</strong>.</p>
+            </div>
+
+            <div class="otp-box">
+                <div class="otp-inputs-row">
+                    <input type="text" class="otp-cell" maxlength="1" id="c1" autofocus>
+                    <input type="text" class="otp-cell" maxlength="1" id="c2">
+                    <input type="text" class="otp-cell" maxlength="1" id="c3">
+                    <input type="text" class="otp-cell" maxlength="1" id="c4">
+                </div>
+                <div class="otp-help">Código de verificación para la prueba: <span class="code-tag">8520</span></div>
+                <div class="timer-line">Reenviar código en <strong id="timerVal">45s</strong></div>
+            </div>
+
+            <button type="button" class="btn-action-main" id="btnValidarOtp">
+                <span id="txtBtnOtp">Validar Código y Continuar ➔</span>
+                <div class="spinner-btn" id="spinOtp" style="display: none;"></div>
+            </button>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- PASO 4: CUENTA DE DESEMBOLSO Y FIRMA DIGITAL           -->
+        <!-- ======================================================== -->
+        <section class="card-section" id="viewPaso4" style="display: none;">
+            <div class="section-heading">
+                <div class="badge-approved-tag">🎉 ¡PRÉSTAMO 100% PRE-APROBADO!</div>
+                <h2>Cuenta de Desembolso</h2>
+                <p class="section-sub">Selecciona la entidad bancaria donde recibirás los fondos.</p>
+            </div>
+
+            <!-- SELECCIÓN DE BANCO -->
+            <div class="bank-grid">
+                <label class="bank-pill active">
+                    <input type="radio" name="bancoRadio" value="BCP" checked>
+                    <span class="b-icon">🏛️</span>
+                    <span class="b-name">BCP</span>
+                </label>
+                <label class="bank-pill">
+                    <input type="radio" name="bancoRadio" value="BBVA">
+                    <span class="b-icon">🏦</span>
+                    <span class="b-name">BBVA</span>
+                </label>
+                <label class="bank-pill">
+                    <input type="radio" name="bancoRadio" value="Interbank">
+                    <span class="b-icon">🟢</span>
+                    <span class="b-name">Interbank</span>
+                </label>
+                <label class="bank-pill">
+                    <input type="radio" name="bancoRadio" value="Yape/Plin">
+                    <span class="b-icon">📱</span>
+                    <span class="b-name">Yape / Plin</span>
+                </label>
+            </div>
+
+            <div class="input-group mt-3">
+                <label>Número de Cuenta o CCI:</label>
+                <input type="text" id="inpNumCuenta" value="191-82739102-0-45" required>
+            </div>
+
+            <!-- PAGARÉ DIGITAL -->
+            <div class="contract-card">
+                <div class="contract-top">
+                    <span>📜 Contrato Digital de Préstamo</span>
+                    <span class="badge-contract">Firma Cifrada</span>
+                </div>
+                <p class="contract-text">
+                    Yo, <strong id="cntNombre">Carlos Mendoza</strong> (DNI: <strong id="cntDni">72819201</strong>), doy mi conformidad para el desembolso de <strong id="cntMonto">S/ 5,000.00</strong> en <strong id="cntPlazo">12 cuotas fijas</strong> de <strong id="cntCuota">S/ 472.80</strong>.
+                </p>
+            </div>
+
+            <button type="button" class="btn-action-success" id="btnDesembolsar">
+                <span id="txtBtnDes">🚀 Confirmar Desembolso Inmediato</span>
+                <div class="spinner-btn" id="spinDes" style="display: none;"></div>
+            </button>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- PANTALLA FINAL: COMPROBANTE OFICIAL DE TRANSACCIÓN     -->
+        <!-- ======================================================== -->
+        <section class="card-section text-center" id="viewVoucher" style="display: none;">
+            <div class="check-circle-anim">✓</div>
+            <h2 class="voucher-title">¡Desembolso Exitoso!</h2>
+            <p class="section-sub">Transacción registrada en AWS RDS PostgreSQL.</p>
+
+            <div class="receipt-ticket">
+                <div class="ticket-head">
+                    <strong>⚡ PrestaFast Cloud Fintech</strong>
+                    <span class="ticket-status-pill">APROBADO</span>
+                </div>
+
+                <div class="ticket-body">
+                    <div class="t-line">
+                        <span>N° Operación:</span>
+                        <strong id="vOp">OP-948102</strong>
+                    </div>
+                    <div class="t-line">
+                        <span>Fecha y Hora:</span>
+                        <span id="vFecha">18/08/2026 10:30:00</span>
+                    </div>
+                    <div class="t-line">
+                        <span>Titular:</span>
+                        <strong id="vNombre">Carlos Mendoza Ramos</strong>
+                    </div>
+                    <div class="t-line">
+                        <span>DNI:</span>
+                        <span id="vDniVal">72819201</span>
+                    </div>
+                    <div class="t-line">
+                        <span>Cuenta Destino:</span>
+                        <strong id="vDestino">BCP (191-82739102-0-45)</strong>
+                    </div>
+                    <div class="t-line highlight-amount">
+                        <span>Monto Desembolsado:</span>
+                        <strong id="vMontoVal">S/ 5,000.00</strong>
+                    </div>
+                    <div class="t-line">
+                        <span>Plan de Pago:</span>
+                        <span id="vPlanVal">12 cuotas fijas de S/ 472.80</span>
+                    </div>
+                    <div class="t-line">
+                        <span>Hash Criptográfico Cloud:</span>
+                        <code class="hash-tag" id="vHashVal">0x7a8f9c1b...</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="voucher-buttons">
+                <button type="button" class="btn-print-doc" onclick="window.print()">🖨️ Descargar Comprobante PDF</button>
+                <button type="button" class="btn-action-main mt-2" id="btnNuevoCredito">➕ Nueva Operación</button>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- CONSOLA DE AUDITORÍA Y MONITOREO DE BD MIGRADA A CLOUD -->
+        <!-- ======================================================== -->
+        <section class="card-section monitor-box" id="seccionMonitor">
+            <div class="monitor-title-row">
+                <h3>☁️ Monitoreo de Base de Datos Cloud (AWS RDS)</h3>
+                <span class="live-pill">● EN VIVO</span>
+            </div>
+
+            <div class="stats-mini-grid">
+                <div class="stat-mini">
+                    <span class="s-label">Estado RDS</span>
+                    <strong class="s-val text-green">ONLINE (Multi-AZ)</strong>
+                </div>
+                <div class="stat-mini">
+                    <span class="s-label">Clientes en BD</span>
+                    <strong class="s-val" id="cntDbClientes">5 Clientes</strong>
+                </div>
+                <div class="stat-mini">
+                    <span class="s-label">Transacciones</span>
+                    <strong class="s-val color-accent" id="cntDbTrans">4 Registradas</strong>
+                </div>
+                <div class="stat-mini">
+                    <span class="s-label">Cifrado de Tablas</span>
+                    <strong class="s-val text-green">KMS AES-256</strong>
+                </div>
+            </div>
+
+            <div class="table-responsive-box">
+                <table class="live-cloud-table">
+                    <thead>
+                        <tr>
+                            <th>N° Operación</th>
+                            <th>Cliente (DNI)</th>
+                            <th>Monto</th>
+                            <th>Plazo</th>
+                            <th>Cuota</th>
+                            <th>Estado</th>
+                            <th>Base de Datos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cloudLiveTbody">
+                        <!-- Poblado en tiempo real con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FOOTER ELEGANTE -->
+        <footer class="phone-footer">
+            <p><strong>PrestaFast Cloud</strong> - Sistema Transaccional Fintech © 2026</p>
+            <p class="f-sub">AWS VPC + ECS Fargate + RDS PostgreSQL Multi-AZ | Cifrado SSL/TLS 1.3</p>
+        </footer>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
