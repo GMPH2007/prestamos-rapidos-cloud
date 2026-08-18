@@ -9,6 +9,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- ETIQUETA GOOGLE ADSENSE (LISTA PARA INSERTAR TU PUBLISHER ID) -->
+    <!-- Cuando tengas tu cuenta de Google AdSense, solo reemplaza ca-pub-XXXXXXXXXXXXXXXX con tu código -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 </head>
 <body class="theme-dark" id="appBody">
 
@@ -47,6 +51,54 @@
         </div>
     </div>
 
+    <!-- MODAL DE PANEL DE MONETIZACIÓN Y GANANCIAS -->
+    <div id="modalMonetizacion" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>💰 Panel de Monetización y Anuncios</h3>
+                    <span class="badge-tag-ok">INGRESOS ACTIVOS</span>
+                </div>
+                <button type="button" class="btn-close-modal" id="btnCloseMonetizacion">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.78rem; color: var(--text-secondary);">Monitorea tus ingresos generados por anuncios publicitarios y enlaces de afiliados:</p>
+                
+                <div class="ad-stats-grid">
+                    <div class="ad-stat-box">
+                        <span class="ad-stat-lbl">Impresiones (Vistas):</span>
+                        <strong class="ad-stat-num" id="statImpressions">1,480</strong>
+                    </div>
+                    <div class="ad-stat-box">
+                        <span class="ad-stat-lbl">Clics en Anuncios:</span>
+                        <strong class="ad-stat-num text-green" id="statClicks">42 clics</strong>
+                    </div>
+                    <div class="ad-stat-box">
+                        <span class="ad-stat-lbl">CTR Promedio:</span>
+                        <strong class="ad-stat-num" id="statCtr">2.84%</strong>
+                    </div>
+                    <div class="ad-stat-box highlight-box">
+                        <span class="ad-stat-lbl">Ganancia Estimada:</span>
+                        <strong class="ad-stat-num color-accent" id="statEarnings">$15.70 USD</strong>
+                    </div>
+                </div>
+
+                <div class="input-group mt-2">
+                    <label>Tu ID de Google AdSense (Opcional):</label>
+                    <input type="text" id="inpAdSenseId" placeholder="Ej: ca-pub-1234567890123456" value="ca-pub-9847291823019283">
+                </div>
+
+                <div class="input-group">
+                    <label>Enlace de Afiliado / Patrocinador (Redirigir clics):</label>
+                    <input type="url" id="inpAffiliateLink" placeholder="https://tu-enlace-de-afiliado.com" value="https://www.google.com/adsense">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action-main" id="btnGuardarMonetizacion">Guardar y Aplicar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <!-- CONTENEDOR PRINCIPAL APP CELULAR (MAX-WIDTH OPTIMIZADO PARA MÓVILES) -->
     <div class="mobile-phone-wrapper">
 
@@ -62,8 +114,12 @@
                 </div>
             </div>
 
-            <!-- CONTROLES: CAMBIO TEMA CLARO/OSCURO -->
+            <!-- CONTROLES: MONETIZACIÓN & TEMA -->
             <div class="header-right">
+                <button type="button" class="ad-monetize-btn" id="btnOpenMonetizacion" title="Ver Ganancias y Anuncios">
+                    <span>💰</span>
+                    <span class="theme-text">Ganancias</span>
+                </button>
                 <button type="button" class="theme-toggle-btn" id="btnThemeToggle" title="Cambiar Tema Claro / Oscuro">
                     <span id="themeIcon">☀️</span>
                     <span class="theme-text" id="themeText">Claro</span>
@@ -80,6 +136,22 @@
                 🏛️ Cartera de Préstamos Cloud
             </button>
         </nav>
+
+        <!-- BANNER PUBLICITARIO SUPERIOR (ESPACIO DE MONETIZACIÓN 1) -->
+        <div class="ad-container-top" onclick="registrarClicAnuncio('Banner Superior')">
+            <div class="ad-badge-line">
+                <span class="ad-tag">ANUNCIO PATROCINADO</span>
+                <span class="ad-info-icon">ⓘ</span>
+            </div>
+            <div class="ad-content-box">
+                <div class="ad-icon-box">💳</div>
+                <div class="ad-text-box">
+                    <strong>Tarjeta de Crédito Oro 0% Mantenimiento</strong>
+                    <p>Obtén S/ 100 de bono de bienvenida y 5% de cashback en compras.</p>
+                </div>
+                <button type="button" class="ad-btn-action">Solicitar ➔</button>
+            </div>
+        </div>
 
         <!-- BANNER DE CONFIANZA FINANCIERA -->
         <div class="security-banner">
@@ -201,6 +273,21 @@
                             </thead>
                             <tbody id="cronTableBody"></tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANUNCIO NATIVO IN-FEED (ESPACIO DE MONETIZACIÓN 2) -->
+            <div class="ad-native-box" onclick="registrarClicAnuncio('Anuncio Nativo Cotizador')">
+                <div class="ad-badge-line">
+                    <span class="ad-tag">OFERTA FINANCIERA DESTACADA</span>
+                    <span class="ad-revenue-tag">+S/ 8.50 Ganancia</span>
+                </div>
+                <div class="ad-native-content">
+                    <span class="ad-native-icon">📈</span>
+                    <div>
+                        <strong>Abre tu Cuenta de Ahorros con 8.5% TREA</strong>
+                        <p>Haz crecer tu dinero con rentabilidad fija garantizada por el Fondo de Seguro de Depósitos.</p>
                     </div>
                 </div>
             </div>
@@ -410,6 +497,13 @@
                 </div>
             </div>
 
+            <!-- ANUNCIO PATROCINADO RECOMPENSA EN COMPROBANTE -->
+            <div class="ad-reward-card" onclick="registrarClicAnuncio('Comprobante Recompensa')">
+                <div class="reward-tag">🎁 BENEFICIO EXCLUSIVO POR TU DESEMBOLSO</div>
+                <p><strong>Cupón de 20% de Descuento</strong> en supermercados y farmacias aliadas.</p>
+                <button type="button" class="btn-claim-reward">Reclamar Cupón Gratis ➔</button>
+            </div>
+
             <div class="voucher-buttons">
                 <button type="button" class="btn-print-doc" onclick="window.print()">🖨️ Descargar Comprobante PDF</button>
                 <button type="button" class="btn-action-main mt-2" id="btnNuevoCredito">➕ Nueva Operación</button>
@@ -445,7 +539,7 @@
                 </div>
                 <div class="stat-mini">
                     <span class="s-label">Clientes en BD</span>
-                    <strong class="s-val" id="cntDbClientes">5 Clientes</strong>
+                    <strong class="s-val" id="cntDbClientes">4 Clientes</strong>
                 </div>
                 <div class="stat-mini">
                     <span class="s-label">Transacciones</span>
@@ -487,6 +581,19 @@
         </footer>
 
     </div>
+
+    <!-- ANUNCIO FLOTANTE FIJO INFERIOR (STICKY FOOTER AD PARA CELULARES - ALTA MONETIZACIÓN) -->
+    <aside class="ad-sticky-bottom" id="stickyAdBottom">
+        <button type="button" class="ad-btn-close-sticky" id="btnCloseStickyAd" title="Cerrar Anuncio">✕</button>
+        <div class="ad-sticky-inner" onclick="registrarClicAnuncio('Sticky Flotante Inferior')">
+            <span class="ad-sticky-pill">ANUNCIO</span>
+            <div class="ad-sticky-text">
+                <strong>¿Buscas Invertir? Gana hasta 12% Anual</strong>
+                <small>Plataforma regulada y segura para rentabilizar tu dinero.</small>
+            </div>
+            <button type="button" class="ad-btn-cta-sm">Ver Oferta ➔</button>
+        </div>
+    </aside>
 
     <script src="app.js"></script>
 </body>

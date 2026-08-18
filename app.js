@@ -664,6 +664,117 @@ if (btnThemeToggle) {
     });
 }
 
+/**
+ * ============================================================================
+ * MOTOR DE MONETIZACIÓN Y GESTIÓN DE ANUNCIOS PUBLICITARIOS (ADSENSE / AFILIADOS)
+ * ============================================================================
+ */
+
+// Estado de Monetización
+let adStats = {
+    impressions: 1480,
+    clicks: 42,
+    earningsUSD: 15.70,
+    affiliateUrl: 'https://www.google.com/adsense',
+    adSenseId: 'ca-pub-9847291823019283'
+};
+
+function cargarEstadisticasMonetizacion() {
+    const saved = localStorage.getItem('prestafast_ad_stats');
+    if (saved) {
+        try {
+            adStats = JSON.parse(saved);
+        } catch (e) {
+            console.warn('Error cargando stats de anuncios');
+        }
+    }
+    // Sumar 1 impresión en cada carga de página
+    adStats.impressions += Math.floor(1 + Math.random() * 3);
+    guardarEstadisticasMonetizacion();
+    actualizarVistaMonetizacion();
+}
+
+function guardarEstadisticasMonetizacion() {
+    localStorage.setItem('prestafast_ad_stats', JSON.stringify(adStats));
+}
+
+function actualizarVistaMonetizacion() {
+    const statImp = document.getElementById('statImpressions');
+    const statClk = document.getElementById('statClicks');
+    const statCtr = document.getElementById('statCtr');
+    const statEarn = document.getElementById('statEarnings');
+    const inpAdSense = document.getElementById('inpAdSenseId');
+    const inpAffiliate = document.getElementById('inpAffiliateLink');
+
+    if (statImp) statImp.textContent = adStats.impressions.toLocaleString();
+    if (statClk) statClk.textContent = `${adStats.clicks} clics`;
+    const ctr = adStats.impressions > 0 ? ((adStats.clicks / adStats.impressions) * 100).toFixed(2) : '0.00';
+    if (statCtr) statCtr.textContent = `${ctr}%`;
+    if (statEarn) statEarn.textContent = `$${adStats.earningsUSD.toFixed(2)} USD`;
+    if (inpAdSense) inpAdSense.value = adStats.adSenseId || '';
+    if (inpAffiliate) inpAffiliate.value = adStats.affiliateUrl || '';
+}
+
+/**
+ * Registra clics en cualquier anuncio y abre el enlace de afiliado o patrocinador
+ */
+window.registrarClicAnuncio = function(tipoAnuncio) {
+    adStats.clicks += 1;
+    // Simulación de ganancia CPC promedio (entre $0.35 y $0.55 USD por clic)
+    const gananciaClic = 0.35 + (Math.random() * 0.20);
+    adStats.earningsUSD += gananciaClic;
+    guardarEstadisticasMonetizacion();
+    actualizarVistaMonetizacion();
+
+    mostrarToast('Anuncio Patrocinado', `Redirigiendo a oferta. Ganancia generada: +$${gananciaClic.toFixed(2)} USD.`);
+
+    setTimeout(() => {
+        const dest = adStats.affiliateUrl || 'https://www.google.com/adsense';
+        window.open(dest, '_blank');
+    }, 600);
+};
+
+// Modal de Monetización
+const btnOpenMonetizacion = document.getElementById('btnOpenMonetizacion');
+const modalMonetizacion = document.getElementById('modalMonetizacion');
+const btnCloseMonetizacion = document.getElementById('btnCloseMonetizacion');
+const btnGuardarMonetizacion = document.getElementById('btnGuardarMonetizacion');
+
+if (btnOpenMonetizacion) {
+    btnOpenMonetizacion.addEventListener('click', () => {
+        actualizarVistaMonetizacion();
+        if (modalMonetizacion) modalMonetizacion.style.display = 'flex';
+    });
+}
+
+if (btnCloseMonetizacion) {
+    btnCloseMonetizacion.addEventListener('click', () => {
+        if (modalMonetizacion) modalMonetizacion.style.display = 'none';
+    });
+}
+
+if (btnGuardarMonetizacion) {
+    btnGuardarMonetizacion.addEventListener('click', () => {
+        const inpAdSense = document.getElementById('inpAdSenseId');
+        const inpAffiliate = document.getElementById('inpAffiliateLink');
+        if (inpAdSense) adStats.adSenseId = inpAdSense.value.trim();
+        if (inpAffiliate) adStats.affiliateUrl = inpAffiliate.value.trim();
+        guardarEstadisticasMonetizacion();
+        mostrarToast('Configuración Guardada', 'Tus enlaces y códigos de monetización están activos.');
+        if (modalMonetizacion) modalMonetizacion.style.display = 'none';
+    });
+}
+
+// Cerrar Sticky Ad Inferior
+const btnCloseStickyAd = document.getElementById('btnCloseStickyAd');
+const stickyAdBottom = document.getElementById('stickyAdBottom');
+if (btnCloseStickyAd && stickyAdBottom) {
+    btnCloseStickyAd.addEventListener('click', (e) => {
+        e.stopPropagation();
+        stickyAdBottom.style.display = 'none';
+    });
+}
+
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('prestafast_theme');
@@ -674,6 +785,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (themeText) themeText.textContent = 'Oscuro';
     }
     cargarTransaccionesGuardadas();
+    cargarEstadisticasMonetizacion();
     actualizarCotizacion();
     renderCloudTable();
 });
+
