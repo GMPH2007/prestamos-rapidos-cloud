@@ -1,17 +1,17 @@
 """
 =============================================================================
-GENERADOR DE DOCUMENTACIÓN OFICIAL EN FORMATO MICROSOFT WORD (.DOCX)
+GENERADOR DE DOCUMENTACIÓN OFICIAL EN MICROSOFT WORD (.DOCX) CON IMÁGENES
 =============================================================================
-Este script compila toda la documentación técnica, manual de funcionamiento,
-arquitectura cloud y entregables en un archivo Word (.docx) formal.
+Compila la documentación completa con diagramas visuales en alta resolución,
+tablas formateadas y manual de uso.
 """
 
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
-from docx.oxml import parse_xml, OxmlElement
-from docx.oxml.ns import nsdecls, qn
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 import os
 
 def set_cell_background(cell, fill_hex):
@@ -26,18 +26,34 @@ def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
     tcMar = parse_xml(f'<w:tcMar {nsdecls("w")}><w:top w:w="{top}" w:type="dxa"/><w:bottom w:w="{bottom}" w:type="dxa"/><w:left w:w="{left}" w:type="dxa"/><w:right w:w="{right}" w:type="dxa"/></w:tcMar>')
     tcPr.append(tcMar)
 
+def add_image_with_caption(doc, image_path, caption_text, width_inches=6.0):
+    """Inserta una imagen centrada con su leyenda formal."""
+    if os.path.exists(image_path):
+        p_img = doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.paragraph_format.space_before = Pt(8)
+        p_img.paragraph_format.space_after = Pt(4)
+        p_img.add_run().add_picture(image_path, width=Inches(width_inches))
+
+        p_cap = doc.add_paragraph()
+        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_cap.paragraph_format.space_after = Pt(12)
+        r_cap = p_cap.add_run(f"Figura: {caption_text}")
+        r_cap.font.size = Pt(9.5)
+        r_cap.font.italic = True
+        r_cap.font.color.rgb = RGBColor(100, 116, 139)
+
 def create_word_document():
     doc = docx.Document()
 
-    # Configuración de márgenes
-    sections = doc.sections
-    for section in sections:
-        section.top_margin = Inches(1)
-        section.bottom_margin = Inches(1)
-        section.left_margin = Inches(1)
-        section.right_margin = Inches(1)
+    # Configuración de márgenes A4
+    for section in doc.sections:
+        section.top_margin = Inches(0.9)
+        section.bottom_margin = Inches(0.9)
+        section.left_margin = Inches(0.9)
+        section.right_margin = Inches(0.9)
 
-    # Estilos de Fuente
+    # Estilos de Fuente Base
     style_normal = doc.styles['Normal']
     font_normal = style_normal.font
     font_normal.name = 'Calibri'
@@ -45,16 +61,17 @@ def create_word_document():
     font_normal.color.rgb = RGBColor(30, 41, 59)
 
     # =========================================================================
-    # PORTADA OFICIAL
+    # PORTADA FORMAL UNIVERSITARIA
     # =========================================================================
     p_logo = doc.add_paragraph()
     p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
     if os.path.exists('logo.png'):
-        p_logo.add_run().add_picture('logo.png', width=Inches(1.6))
+        p_logo.add_run().add_picture('logo.png', width=Inches(1.8))
 
     p_univ = doc.add_paragraph()
     p_univ.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_univ = p_univ.add_run("INGENIERÍA DE SISTEMAS E INFORMÁTICA\nGESTIÓN DE PROYECTOS DE TI Y ARQUITECTURA CLOUD")
+    p_univ.paragraph_format.space_before = Pt(10)
+    run_univ = p_univ.add_run("INGENIERÍA DE SISTEMAS E INFORMÁTICA\nGESTIÓN DE PROYECTOS DE TI / ARQUITECTURA DE SOFTWARE Y CLOUD")
     run_univ.font.size = Pt(13)
     run_univ.font.bold = True
     run_univ.font.color.rgb = RGBColor(37, 99, 235)
@@ -63,19 +80,19 @@ def create_word_document():
 
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_title = p_title.add_run("TRABAJO ENCARGADO:\nPLATAFORMA WEB FINTECH DE PRÉSTAMOS RÁPIDOS Y PLAN DE MIGRACIÓN DE BASE DE DATOS A LA NUBE (AWS RDS)")
-    run_title.font.size = Pt(18)
+    run_title = p_title.add_run("INFORME TÉCNICO Y MANUAL DE FUNCIONAMIENTO:\nPLATAFORMA FINTECH DE PRÉSTAMOS RÁPIDOS Y MIGRACIÓN DE BASE DE DATOS A LA NUBE (AWS RDS)")
+    run_title.font.size = Pt(17)
     run_title.font.bold = True
     run_title.font.color.rgb = RGBColor(15, 23, 42)
 
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_sub = p_sub.add_run("Manual de Funcionamiento, Arquitectura de Infraestructura, Matriz RACI y Ciclo de Vida del Proyecto")
-    run_sub.font.size = Pt(11)
+    run_sub = p_sub.add_run("Clasificación de Proyectos TI • Componentes Cloud • Matriz RACI • Ciclo de Vida • Manual de Usuario • Checksums")
+    run_sub.font.size = Pt(10.5)
     run_sub.font.italic = True
     run_sub.font.color.rgb = RGBColor(100, 116, 139)
 
-    doc.add_paragraph("\n\n")
+    doc.add_paragraph("\n")
 
     # Tabla de Datos de Entrega
     table_meta = doc.add_table(rows=4, cols=2)
@@ -84,7 +101,7 @@ def create_word_document():
         ("Proyecto / Sistema:", "PrestaFast Cloud (Sistema Transaccional Web Móvil)"),
         ("Enlace Web en Vivo:", "https://gmph2007.github.io/prestamos-rapidos-cloud/"),
         ("Repositorio GitHub:", "https://github.com/GMPH2007/prestamos-rapidos-cloud"),
-        ("Año Académico:", "2026")
+        ("Fecha / Año Académico:", "2026")
     ]
     for idx, (label, val) in enumerate(meta_data):
         row = table_meta.rows[idx]
@@ -101,13 +118,13 @@ def create_word_document():
         
         set_cell_background(cell_lbl, "F1F5F9")
         set_cell_background(cell_val, "F8FAFC")
-        set_cell_margins(cell_lbl, 80, 80, 120, 120)
-        set_cell_margins(cell_val, 80, 80, 120, 120)
+        set_cell_margins(cell_lbl, 70, 70, 110, 110)
+        set_cell_margins(cell_val, 70, 70, 110, 110)
 
     doc.add_page_break()
 
     # =========================================================================
-    # SECCIÓN 1: RESUMEN EJECUTIVO Y OBJETIVOS
+    # SECCIÓN 1: RESUMEN EJECUTIVO
     # =========================================================================
     h1 = doc.add_heading("1. Resumen Ejecutivo del Proyecto", level=1)
     h1.runs[0].font.color.rgb = RGBColor(30, 58, 138)
@@ -154,12 +171,14 @@ def create_word_document():
     p_t4.add_run("Integración mediante microservicios y webhooks con burós de crédito (validación de riesgo) y pasarelas de desembolso interbancario (BCP, BBVA, Interbank, Yape/Plin).")
 
     # =========================================================================
-    # SECCIÓN 3: 3 COMPONENTES CLAVE DE INFRAESTRUCTURA
+    # SECCIÓN 3: 3 COMPONENTES CLAVE DE INFRAESTRUCTURA + DIAGRAMA
     # =========================================================================
     h3 = doc.add_heading("3. Identificación y Justificación de 3 Componentes Clave de Infraestructura", level=1)
     h3.runs[0].font.color.rgb = RGBColor(30, 58, 138)
 
-    # Componente 1
+    # Insertar Imagen de Arquitectura Cloud
+    add_image_with_caption(doc, "diagrama_arquitectura_cloud.png", "Topología de Infraestructura Segura AWS VPC, ECS Fargate y RDS PostgreSQL Multi-AZ.")
+
     p_c1 = doc.add_paragraph()
     p_c1.add_run("A. Base de Datos Relacional Gestionada (DBaaS) - AWS RDS PostgreSQL Multi-AZ\n").font.bold = True
     p_c1.add_run(
@@ -168,7 +187,6 @@ def create_word_document():
         "backups continuos con Point-In-Time Recovery (PITR) de hasta 35 días y cifrado nativo KMS (AES-256)."
     )
 
-    # Componente 2
     p_c2 = doc.add_paragraph()
     p_c2.add_run("B. Capa de Cómputo Elástico en Contenedores - AWS ECS con AWS Fargate\n").font.bold = True
     p_c2.add_run(
@@ -177,7 +195,6 @@ def create_word_document():
         "y modelo Serverless sin necesidad de administrar servidores físicos."
     )
 
-    # Componente 3
     p_c3 = doc.add_paragraph()
     p_c3.add_run("C. Red Privada Virtual Aislada, WAF y Balanceador - AWS VPC + AWS WAF + ALB\n").font.bold = True
     p_c3.add_run(
@@ -198,15 +215,13 @@ def create_word_document():
     table_roles.alignment = WD_TABLE_ALIGNMENT.CENTER
     headers_roles = ["Rol en el Proyecto", "Primera Tarea Asignada (Hito de Inicio)", "Entregable Concreto"]
     
-    # Encabezados
     for col_idx, text in enumerate(headers_roles):
         cell = table_roles.rows[0].cells[col_idx]
-        p = cell.paragraphs[0]
-        run = p.add_run(text)
+        run = cell.paragraphs[0].add_run(text)
         run.font.bold = True
         run.font.color.rgb = RGBColor(255, 255, 255)
         set_cell_background(cell, "1E3A8A")
-        set_cell_margins(cell, 100, 100, 120, 120)
+        set_cell_margins(cell, 80, 80, 100, 100)
 
     roles_data = [
         ("1. Project Manager (Scrum Master)", "Elaborar el Acta de Constitución del Proyecto (Project Charter) y el Backlog de Sprints inicial.", "Project Charter firmado y tablero Jira."),
@@ -220,20 +235,22 @@ def create_word_document():
         bg = "F8FAFC" if row_idx % 2 == 1 else "FFFFFF"
         for col_idx, text in enumerate(r_data):
             cell = table_roles.rows[row_idx].cells[col_idx]
-            p = cell.paragraphs[0]
-            run = p.add_run(text)
+            run = cell.paragraphs[0].add_run(text)
             if col_idx == 0:
                 run.font.bold = True
             set_cell_background(cell, bg)
-            set_cell_margins(cell, 80, 80, 100, 100)
+            set_cell_margins(cell, 70, 70, 90, 90)
 
     doc.add_paragraph("\n")
 
     # =========================================================================
-    # SECCIÓN 5: CICLO DE VIDA CON 1 ENTREGABLE POR FASE
+    # SECCIÓN 5: CICLO DE VIDA CON 1 ENTREGABLE POR FASE + DIAGRAMA
     # =========================================================================
     h5 = doc.add_heading("5. Esquema del Ciclo de Vida del Proyecto (1 Entregable Clave por Fase)", level=1)
     h5.runs[0].font.color.rgb = RGBColor(30, 58, 138)
+
+    # Insertar Imagen de Ciclo de Vida
+    add_image_with_caption(doc, "diagrama_ciclo_vida.png", "Ciclo de Vida de 5 Fases con 1 Entregable Formal Obligatorio por Fase.")
 
     table_fases = doc.add_table(rows=6, cols=3)
     table_fases.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -245,7 +262,7 @@ def create_word_document():
         run.font.bold = True
         run.font.color.rgb = RGBColor(255, 255, 255)
         set_cell_background(cell, "0F766E")
-        set_cell_margins(cell, 100, 100, 120, 120)
+        set_cell_margins(cell, 80, 80, 100, 100)
 
     fases_data = [
         ("Fase 1: Inicio y Requerimientos", "Definir alcance del negocio, reglas de crédito y viabilidad técnica.", "Documento SRS (Especificación de Requerimientos) y Project Charter."),
@@ -266,19 +283,18 @@ def create_word_document():
                 run.font.bold = True
                 run.font.color.rgb = RGBColor(15, 118, 110)
             set_cell_background(cell, bg)
-            set_cell_margins(cell, 80, 80, 100, 100)
+            set_cell_margins(cell, 70, 70, 90, 90)
 
     doc.add_page_break()
 
     # =========================================================================
-    # SECCIÓN 6: MANUAL DE USO Y FUNCIONAMIENTO PASO A PASO
+    # SECCIÓN 6: MANUAL DE USO PASO A PASO + DIAGRAMA DE FLUJO
     # =========================================================================
     h6 = doc.add_heading("6. Manual de Uso y Funcionamiento de la Plataforma Web Móvil", level=1)
     h6.runs[0].font.color.rgb = RGBColor(30, 58, 138)
 
-    doc.add_paragraph(
-        "La plataforma web desarrollada (PrestaFast) opera bajo un flujo transaccional continuo de 4 pasos sin recargas de página, optimizado para celulares y computadoras:"
-    )
+    # Insertar Imagen de Flujo Transaccional
+    add_image_with_caption(doc, "diagrama_flujo_app.png", "Flujo Operativo de la Aplicación Móvil en 5 Pasos Transaccionales.")
 
     steps_manual = [
         ("Paso 1 - Cotización y Amortización Francesa:", 
@@ -299,12 +315,9 @@ def create_word_document():
          "El usuario elige el banco de destino (BCP, BBVA, Interbank o Yape/Plin), ingresa su número de cuenta/CCI y acepta el pagaré digital con firma electrónica cifrada. "
          "Al confirmar, la transacción se procesa y se escribe directamente en la base de datos AWS RDS."),
         
-        ("Pantalla de Comprobante Oficial:",
+        ("Paso 5 - Pantalla de Comprobante Oficial y Auditoría Cloud:",
          "Se genera un ticket bancario con N° de Operación único (ej. OP-948102), fecha y hora exacta, datos del titular y Hash Criptográfico en la Nube. "
-         "Incluye botón para Descargar o Imprimir el Comprobante en PDF."),
-        
-        ("Consola de Monitoreo Cloud en Tiempo Real:",
-         "En la sección inferior, la tabla de auditoría en vivo muestra inmediatamente la nueva transacción registrada en AWS RDS PostgreSQL junto con las métricas de estado (Online Multi-AZ y cifrado KMS).")
+         "Incluye botón para Descargar o Imprimir el Comprobante en PDF, y la operación se refleja inmediatamente en la consola de AWS RDS inferior.")
     ]
 
     for title, desc in steps_manual:
@@ -314,13 +327,16 @@ def create_word_document():
         r_t.font.color.rgb = RGBColor(37, 99, 235)
         p.add_run(desc)
 
-    doc.add_paragraph("\n")
+    doc.add_page_break()
 
     # =========================================================================
-    # SECCIÓN 7: ESTRATEGIA DE MIGRACIÓN DE BD Y SCRIPTS
+    # SECCIÓN 7: ESTRATEGIA DE MIGRACIÓN DE BD + DIAGRAMA
     # =========================================================================
     h7 = doc.add_heading("7. Plan Técnico de Migración de Base de Datos y Validación por Checksums", level=1)
     h7.runs[0].font.color.rgb = RGBColor(30, 58, 138)
+
+    # Insertar Imagen de Migración
+    add_image_with_caption(doc, "diagrama_migracion_bd.png", "Estrategia Técnica de Migración Replatform con Verificación por Checksums SHA-256.")
 
     doc.add_paragraph(
         "Se adoptó la estrategia Replatform (Lift, Tinker and Shift) automatizada mediante script Python (scripts/migrate_to_cloud.py). "
@@ -336,9 +352,9 @@ def create_word_document():
     )
 
     # =========================================================================
-    # SECCIÓN 8: CONCLUSIONES Y ENLACES OFICIALES
+    # SECCIÓN 8: ENLACES OFICIALES
     # =========================================================================
-    h8 = doc.add_heading("8. Enlaces de Acceso y Conclusiones", level=1)
+    h8 = doc.add_heading("8. Enlaces Oficiales de Consulta", level=1)
     h8.runs[0].font.color.rgb = RGBColor(30, 58, 138)
 
     p_links = doc.add_paragraph()
@@ -347,10 +363,10 @@ def create_word_document():
     p_links.add_run("• Repositorio de Código Fuente y Documentación: ").font.bold = True
     p_links.add_run("https://github.com/GMPH2007/prestamos-rapidos-cloud")
 
-    # Guardar documento
+    # Guardar documento Word
     output_path = "DOCUMENTO_FINAL_PRESTAMOS_CLOUD.docx"
     doc.save(output_path)
-    print(f"Documento Word creado con éxito en: {output_path}")
+    print(f"Documento Word con imágenes creado exitosamente en: {output_path}")
 
 if __name__ == "__main__":
     create_word_document()
